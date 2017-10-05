@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tank 1990 - Reborn!</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid black;
+            background-color: black;
+        }
+    </style>
+    <script>
+
+        var myGamePiece;
+        var curtain = [{x: 0, y: 0, m: 32*16, n: 16}, {x: 0, y: 0, m: 32, n: 32*14}, {x: 0, y: 32*13.5, m: 32*16, n: 16},{x: 32*14, y: 0, m: 32*3, n: 32*14},];
+        var bricks = [];
+        var brickBlock = [];
+        var steel = [];
+        var steelBlock = [];
+        var bushes = [];
+        var waterzone = [];
+        var ahihi = [];
+        var myScore;
+        var myBullet = [];
+        var hasAlreadyShot = false;
+        var eventLog = "up";
+        var eventHold = "up";
+        var bulletHit;
+        var recordDirection = "up";
+        var _sizeblock = 32/2;
+        var _sizetank = 32;
+        var _sizebullet = 8;
+
+        function getMapDetails(mapid) {
+            if (mapid == 1) {
+                bricks = [{x:208,y:416},{x:208,y:400},{x:208,y:384},{x:224,y:384},{x:240,y:384},{x:256,y:384},{x:256,y:400},{x:256,y:416},{x:64,y:368},{x:80,y:368},{x:64,y:384},{x:80,y:384},{x:64,y:336},{x:80,y:336},{x:64,y:352},{x:80,y:352},{x:64,y:304},{x:80,y:304},{x:64,y:320},{x:80,y:320},{x:128,y:304},{x:144,y:304},{x:128,y:320},{x:144,y:320},{x:128,y:336},{x:144,y:336},{x:128,y:352},{x:144,y:352},{x:128,y:368},{x:144,y:368},{x:128,y:384},{x:144,y:384},{x:192,y:304},{x:208,y:304},{x:192,y:320},{x:208,y:320},{x:192,y:272},{x:208,y:272},{x:192,y:288},{x:208,y:288},{x:224,y:272},{x:240,y:272},{x:224,y:288},{x:240,y:288},{x:256,y:272},{x:272,y:272},{x:256,y:288},{x:272,y:288},{x:256,y:304},{x:272,y:304},{x:256,y:320},{x:272,y:320},{x:320,y:368},{x:336,y:368},{x:320,y:384},{x:336,y:384},{x:320,y:336},{x:336,y:336},{x:320,y:352},{x:336,y:352},{x:320,y:304},{x:336,y:304},{x:320,y:320},{x:336,y:320},{x:384,y:304},{x:400,y:304},{x:384,y:320},{x:400,y:320},{x:384,y:336},{x:400,y:336},{x:384,y:352},{x:400,y:352},{x:384,y:368},{x:400,y:368},{x:384,y:384},{x:400,y:384},{x:192,y:336},{x:208,y:336},{x:256,y:336},{x:272,y:336},{x:128,y:288},{x:144,y:288},{x:64,y:288},{x:80,y:288},{x:320,y:288},{x:336,y:288},{x:384,y:288},{x:400,y:288},{x:256,y:256},{x:272,y:256},{x:192,y:256},{x:208,y:256},{x:352,y:240},{x:368,y:240},{x:320,y:240},{x:336,y:240},{x:96,y:240},{x:112,y:240},{x:128,y:240},{x:144,y:240},{x:32,y:224},{x:48,y:224},{x:96,y:224},{x:112,y:224},{x:128,y:224},{x:144,y:224},{x:320,y:224},{x:336,y:224},{x:352,y:224},{x:368,y:224},{x:416,y:224},{x:432,y:224},{x:192,y:208},{x:208,y:208},{x:256,y:208},{x:272,y:208},{x:256,y:192},{x:272,y:192},{x:192,y:192},{x:208,y:192},{x:128,y:176},{x:144,y:176},{x:64,y:176},{x:80,y:176},{x:320,y:176},{x:336,y:176},{x:384,y:176},{x:400,y:176},{x:256,y:144},{x:272,y:144},{x:192,y:144},{x:208,y:144},{x:128,y:144},{x:144,y:144},{x:128,y:160},{x:144,y:160},{x:64,y:144},{x:80,y:144},{x:64,y:160},{x:80,y:160},{x:64,y:112},{x:80,y:112},{x:64,y:128},{x:80,y:128},{x:64,y:80},{x:80,y:80},{x:64,y:96},{x:80,y:96},{x:64,y:48},{x:80,y:48},{x:64,y:64},{x:80,y:64},{x:128,y:48},{x:144,y:48},{x:128,y:64},{x:144,y:64},{x:128,y:80},{x:144,y:80},{x:128,y:96},{x:144,y:96},{x:128,y:112},{x:144,y:112},{x:128,y:128},{x:144,y:128},{x:192,y:112},{x:208,y:112},{x:192,y:128},{x:208,y:128},{x:192,y:80},{x:208,y:80},{x:192,y:96},{x:208,y:96},{x:192,y:48},{x:208,y:48},{x:192,y:64},{x:208,y:64},{x:256,y:48},{x:272,y:48},{x:256,y:64},{x:272,y:64},{x:256,y:80},{x:272,y:80},{x:256,y:96},{x:272,y:96},{x:256,y:112},{x:272,y:112},{x:256,y:128},{x:272,y:128},{x:320,y:144},{x:336,y:144},{x:320,y:160},{x:336,y:160},{x:320,y:112},{x:336,y:112},{x:320,y:128},{x:336,y:128},{x:320,y:80},{x:336,y:80},{x:320,y:96},{x:336,y:96},{x:320,y:48},{x:336,y:48},{x:320,y:64},{x:336,y:64},{x:384,y:48},{x:400,y:48},{x:384,y:64},{x:400,y:64},{x:384,y:80},{x:400,y:80},{x:384,y:96},{x:400,y:96},{x:384,y:112},{x:400,y:112},{x:384,y:128},{x:400,y:128},{x:384,y:144},{x:400,y:144},{x:384,y:160},{x:400,y:160}];
+                steel = [{x:32,y:240},{x:48,y:240},{x:416,y:240},{x:432,y:240},{x:224,y:112},{x:240,y:112},{x:224,y:128},{x:240,y:128}];
+                ahihi = [{x:224,y:400}];
+            }
+        }
+        function getRandNum(max, min) {
+            return Math.floor((Math.random()) * (max - min)) + min;
+        }
+        function startGame() {
+            getMapDetails(1);
+            myGamePiece = new component(_sizetank, _sizetank, "", 50, 250, "tank");
+            for (i=0;i<bricks.length;i+=1) {
+                brickBlock.push(new component(_sizeblock, _sizeblock, "", bricks[i].x, bricks[i].y, "bricks"));
+            }
+            for (i=0;i<steel.length;i+=1) {
+                steelBlock.push(new component(_sizeblock, _sizeblock, "", steel[i].x, steel[i].y, "steel"));
+            }
+            myScore = new component("15px", "Consolas", "black", 400, 40, "score");
+            myGameArea.start();
+        }
+
+        var myGameArea = {
+            canvas : document.createElement("canvas"),
+            start : function() {
+                var FPS = 50;
+                this.canvas.width = 32*16;
+                this.canvas.height = 32*14;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 1000 / FPS);
+            },
+            clear : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        var getImage = function(event,type) {
+            var img = new Image();
+            if (type == "tank") {
+                switch (event) {
+                    case "up":
+                        img.src = "tankup.png";
+                        break;
+                    case "down":
+                        img.src = "tankdown.png";
+                        break;
+                    case "left":
+                        img.src = "tankleft.png";
+                        break;
+                    case "right":
+                        img.src = "tankright.png";
+                        break;
+                    default:
+                        img.src = "tankup.png";
+                }
+            } else if (type == "bullet") {
+                switch (event) {
+                    case "up":
+                        img.src = "bulletup.png";
+                        break;
+                    case "down":
+                        img.src = "bulletdown.png";
+                        break;
+                    case "left":
+                        img.src = "bulletleft.png";
+                        break;
+                    case "right":
+                        img.src = "bulletright.png";
+                        break;
+                    default:
+                        img.src = "bulletup.png";
+                }
+            } else if (type == "bricks") {
+                img.src = "brick.png";
+            } else if (type == "steel") {
+                img.src = "steel.png";
+            } else if (type == "trees") {
+                img.src = "trees.png";
+            } else if (type == "water") {
+                img.src = "water.png";
+            }
+            return img;
+        }
+
+        function component(width, height, color, x, y, type) {
+            this.type = type;
+            this.score = 0;
+            this.width = width;
+            this.height = height;
+            this.speedX = 0;
+            this.speedY = 0;
+            this.x = x;
+            this.y = y;
+            this.bullx = 0;
+            this.bully = 0;
+            this.update = function() {
+                ctx = myGameArea.context;
+                switch (this.type) {
+                    case "score":
+                    ctx.font = this.width + " " + this.height;
+                    ctx.fillStyle = color;
+                    ctx.fillText(this.text, this.x, this.y);
+                    break;
+                    case "tank":
+                    ctx.drawImage(getImage(eventLog, this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    case "bullet":
+                    ctx.drawImage(getImage(eventHold, this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    case "bricks":
+                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    case "trees":
+                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    case "water":
+                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    case "steel":
+                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
+                    break;
+                    default:
+                    ctx.fillStyle = color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+            this.newPos = function(type) {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.hitBorder(type);
+            }
+            this.hitBorder = function(type) {
+                var heightBorder = myGameArea.canvas.height - this.height - 16;
+                var widthBorder = myGameArea.canvas.width - this.width - 32*(16-14);
+                if (type == 1) {
+                    if (this.y < 16) this.y = 16;
+                    else if (this.y > heightBorder) this.y = heightBorder;
+                    if (this.x < 32) this.x = 32;
+                    else if (this.x > widthBorder) this.x = widthBorder;
+                } else if (type == 2) {
+                    if (this.x < 0 || this.x > widthBorder || this.y < 0 || this.y > heightBorder) {
+                        bulletHit = true;
+                    }
+                }
+            }
+            this.crashWith = function(type, obj) {
+                if (type == 1) {
+                    var x_leftUpCorner = this.x;
+                    var x_rightUp = this.x + _sizetank;
+                    var y_leftDown = this.x
+                }
+            }
+            this.shotBullet = function(ex, ey) {
+                if (!hasDirection) eventHold = eventLog;
+                hasDirection = true;
+                setTimeout(function () {
+                    hasDirection = false;
+                },1000);
+                if (eventHold == "up") {
+                    this.bullx = ex + 10;
+                    this.bully = ey - 10;
+                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
+                } else if (eventHold == "down") {
+                    this.bullx = ex + 10;
+                    this.bully = ey + 10;
+                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
+                } else if (eventHold == "left") {
+                    this.bullx = ex - 20;
+                    this.bully = ey + 10;
+                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
+                } else if (eventHold == "right") {
+                    this.bullx = ex + 30;
+                    this.bully = ey + 10;
+                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
+                }
+            }
+        }
+        function updateGameArea() {
+            //var newx = this.bullx, newy = this.bully;
+            var brickBlock = [], steelBlock = [], curtainBlock = [];
+            for (i = 0; i < bricks.length; i += 1) {
+                if (myGamePiece.crashWith(bricks[i])) {
+                    return;
+                }
+            }
+            myGameArea.clear();
+            myGameArea.frameNo += 1;
+            if (myGameArea.frameNo == 1) {
+                getMapDetails(1);
+                myBullet.push(new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet"));
+            }
+            for (i=0;i<bricks.length;i+=1) {
+                brickBlock.push(new component(_sizeblock, _sizeblock, "", bricks[i].x, bricks[i].y, "bricks"));
+                brickBlock[i].update();
+            }
+            for (i=0;i<steel.length;i+=1) {
+                steelBlock.push(new component(_sizeblock, _sizeblock, "", steel[i].x, steel[i].y, "steel"));
+                steelBlock[i].update();
+            }
+            for (i=0;i<curtain.length;i+=1) {
+                curtainBlock.push(new component(curtain[i].m, curtain[i].n, "#808080", curtain[i].x, curtain[i].y));
+                curtainBlock[i].update();
+            }
+            for (i = 0; i < myBullet.length; i += 1) {
+                switch (eventHold) {
+                    case "up":
+                        myBullet[i].speedX = 0;
+                        myBullet[i].speedY = -10;
+                        recordDirection = eventHold;
+                        break;
+                    case "down":
+                        myBullet[i].speedX = 0;
+                        myBullet[i].speedY = 10;
+                        recordDirection = eventHold;
+                        break;
+                    case "left":
+                        myBullet[i].speedX = -10;
+                        myBullet[i].speedY = 0;
+                        recordDirection = eventHold;
+                        break;
+                    case "right":
+                        myBullet[i].speedX = 10;
+                        myBullet[i].speedY = 0;
+                        recordDirection = eventHold;
+                        break;
+                }
+                myBullet[i].newPos(2);
+                if (!hasAlreadyShot) break;
+                if (bulletHit) {
+                    bulletHit = false;
+                    break;
+                }
+                myBullet[i].update();
+            }
+            myGamePiece.newPos(1);
+            myGamePiece.update();
+        }
+        function everyinterval(n) {
+            if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+            return false;
+        }
+        function up() {
+            myGamePiece.speedY = -1;
+            eventLog = "up";
+        }
+        function down() {
+            myGamePiece.speedY = 1;
+            eventLog = "down";
+        }
+        function left() {
+            myGamePiece.speedX = -1;
+            eventLog = "left";
+        }
+        function right() {
+            myGamePiece.speedX = 1;
+            eventLog = "right";
+        }
+        function shot() {
+            var shotInterval;
+            if (!hasAlreadyShot) {
+                hasAlreadyShot = true;
+                hasDirection = false;
+                shotInterval = setTimeout(function () {
+                    hasAlreadyShot = false;
+                }, 1000);
+                myGamePiece.shotBullet(myGamePiece.x, myGamePiece.y);
+            }
+
+        }
+        function randomRelocate() {
+
+        }
+        function clearmove() {
+            myGamePiece.speedX = 0;
+            myGamePiece.speedY = 0;
+        }
+    </script>
+</head>
+<body onload="startGame()">
+<div style="text-align:center;width:320px;">
+    <button ontouchstart="up()" onmousedown="up()" onmouseup="clearmove()">UP</button><br><br>
+    <button ontouchstart="left()" onmousedown="left()" onmouseup="clearmove()">LEFT</button>
+    <button ontouchstart="right()" onmousedown="right()" onmouseup="clearmove()">RIGHT</button><br><br>
+    <button ontouchstart="down()" onmousedown="down()" onmouseup="clearmove()">DOWN</button>
+    <br>
+    <button ontouchstart="shot()" onmousedown="shot()">SHOT</button>
+</div>
+</body>
+</html>
