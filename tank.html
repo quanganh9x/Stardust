@@ -15,11 +15,9 @@
         }
     </style>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
-    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
     <!-- <link rel="prefetch" href="image.png"> -->
     <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase-database.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="js/imgRender.js"></script>
     <script>
         // Initialize Firebase
@@ -40,17 +38,13 @@
         var firebaseData = firebase.database(); // initialization for firebase
         var myGamePiece, myGamePiece2, myGamePiece3, myGamePiece4; // 4 players - in development
         var curtain = [{x: 0, y: 0, m: 32*16, n: 16}, {x: 0, y: 0, m: 32, n: 32*14}, {x: 0, y: 32*13.5, m: 32*16, n: 16},{x: 32*14, y: 0, m: 32*3, n: 32*14},], curtainBlock = [];
-        var bricks = [], brickBlock = [];
-        var steel = [], steelBlock = [];
-        var bushes = [], bushesBlock = [];
-        var water = [], waterBlock = [];
-        var base = [], baseBlock;
+        var bricks = [], steel = [], trees = [], water = [], base = [];
         var ctx;
         var myLife = 3; // not yet used
-        var myBullet = [];
+        var myBullet = [], guestBullet = [];
         var hasAlreadyShot = false;
         var eventLog = "up", eventHold = "up";
-        var bulletHit;
+        var bulletHitBorder, bulletGuestHitBorder;
         var recordDirectionOfBullet = "up";
         var _sizeblock = 16;
         var _sizetank = 32;
@@ -59,6 +53,7 @@
         var userId = "";
         var guestId = "";
         var lineStatus = 0;
+        var issetTraject = false;
         //
 
         document.addEventListener("DOMContentLoaded", function(event) {
@@ -102,6 +97,7 @@
                 switch (type) {
                     case "tank":
                         firebaseData.ref("players/" + userId + "/tank").set({
+                            life: myLife,
                             x: x,
                             y: y,
                             d: eventLog
@@ -117,9 +113,39 @@
                 }
             }
         }
+        function writeBulletTraject(speedx, speedy) {
+            if (lineStatus == 1) {
+                firebaseData.ref("players/" + userId + "/traject").set({
+                    sx: speedx,
+                    sy: speedy
+                });
+                issetTraject = true;
+            }
+        }
+        function writeShotStatus (stat) {
+            if (lineStatus == 1) {
+                firebaseData.ref("players/" + userId + "/bulletstatus").set({
+                    fired: stat
+                });
+            }
+        }
+        function readShotStatus() {
+            if (lineStatus == 1) {
+                var saveStatus = firebase.database().ref('players/' + guestId + '/bulletstatus/fired');
+                saveStatus.on('value', function(snapshot) {
+                    status = snapshot.val();
+                });
+            }
+            if (status == "true") return true;
+            return false;
+        }
         function readData() {
             var dataGuest = [];
             if (lineStatus == 1) {
+                var saveLife = firebase.database().ref('players/' + guestId + '/tank/life');
+                saveLife.on('value', function(snapshot) {
+                    dataGuest[3] = snapshot.val();
+                });
                 var saveX = firebase.database().ref('players/' + guestId + '/tank/x');
                 saveX.on('value', function(snapshot) {
                     dataGuest[0] = snapshot.val();
@@ -131,6 +157,32 @@
                 var saveDir = firebase.database().ref('players/' + guestId + '/tank/d');
                 saveDir.on('value', function(snapshot) {
                     dataGuest[2] = snapshot.val();
+                });
+            }
+            return dataGuest;
+        }
+        function readBulletTraject() {
+            var dataGuest = [];
+            if (lineStatus == 1) {
+                var saveSpeedX = firebase.database().ref('players/' + guestId + '/traject/sx');
+                saveSpeedX.on('value', function(snapshot) {
+                    dataGuest[0] = snapshot.val();
+                });
+                var saveSpeedY = firebase.database().ref('players/' + guestId + '/traject/sy');
+                saveSpeedY.on('value', function(snapshot) {
+                    dataGuest[1] = snapshot.val();
+                });
+                var saveX = firebase.database().ref('players/' + guestId + '/bullet/x');
+                saveX.on('value', function(snapshot) {
+                    dataGuest[2] = snapshot.val();
+                });
+                var saveY = firebase.database().ref('players/' + guestId + '/bullet/y');
+                saveY.on('value', function(snapshot) {
+                    dataGuest[3] = snapshot.val();
+                });
+                var saveDir = firebase.database().ref('players/' + guestId + '/bullet/d');
+                saveDir.on('value', function(snapshot) {
+                    dataGuest[4] = snapshot.val();
                 });
             }
             return dataGuest;
@@ -195,7 +247,7 @@
         }
 
         function startGame() {
-            myGamePiece = new component(_sizetank, _sizetank, "", 50, 32*14-16-32, "tank");
+            myGamePiece = new component(_sizetank, _sizetank, "", 50, 32*12.5, "tank");
             //myGamePiece2 = new component(_sizetank, _sizetank, "", 50, 400, "tank");
             myScore = new component("15px", "Consolas", "black", 400, 40, "score");
             myGameArea.start();
@@ -235,7 +287,10 @@
                         ctx.drawImage(imgRender.getImage(readData()[2], this.type), this.x, this.y, this.width, this.height);
                         break;
                     case "bullet":
-                        ctx.drawImage(imgRender.getImage(eventHold, this.type), this.x, this.y, this.width, this.height);
+                        ctx.drawImage(imgRender.getImage(recordDirectionOfBullet, this.type), this.x, this.y, this.width, this.height);
+                        break;
+                    case "bullet2":
+                        ctx.drawImage(imgRender.getImage(readBulletTraject()[4], this.type), this.x, this.y, this.width, this.height);
                         break;
                     default:
                         ctx.fillStyle = color;
@@ -258,7 +313,15 @@
                 } else if (type == 2) {
                     if (this.x < 32 || this.x > widthBorder || this.y < 16 || this.y > heightBorder) {
                         myBullet.splice(0,myBullet.length);
-                        bulletHit = true;
+                        bulletHitBorder = true;
+                        setTimeout(function () {
+                            writeShotStatus(false);
+                        },10000000);
+                    }
+                } else if (type == 3) {
+                    if (this.x < 32 || this.x > widthBorder || this.y < 16 || this.y > heightBorder) {
+                        guestBullet.splice(0,guestBullet.length);
+                        bulletGuestHitBorder = true;
                     }
                 }
             }
@@ -278,85 +341,98 @@
                 }
              return false;
             }*/
-            this.shotBullet = function(ex, ey) {
-                if (!hasDirection) eventHold = eventLog;
-                hasDirection = true;
-                setTimeout(function () {
-                    hasDirection = false;
-                },1000);
-                if (eventHold == "up") {
-                    this.bullx = ex + 10;
-                    this.bully = ey - 10;
-                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
-                } else if (eventHold == "down") {
-                    this.bullx = ex + 10;
-                    this.bully = ey + 10;
-                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
-                } else if (eventHold == "left") {
-                    this.bullx = ex - 20;
-                    this.bully = ey + 10;
-                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
-                } else if (eventHold == "right") {
-                    this.bullx = ex + 30;
-                    this.bully = ey + 10;
-                    myBullet[0] = new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet");
+            this.shotBullet = function() {
+                if (!hasAlreadyShot) {
+                    hasAlreadyShot = true;
+                    setTimeout(function () {
+                        hasAlreadyShot = false;
+                    },1000);
+                    var bullx, bully;
+                    recordDirectionOfBullet = eventLog;
+                    switch (recordDirectionOfBullet) {
+                        case "up":
+                            bullx = this.x + 10;
+                            bully = this.y - 10;
+                            break;
+                        case "down":
+                            bullx = this.x + 10;
+                            bully = this.y + 10;
+                            break;
+                        case "left":
+                            bullx = this.x - 20;
+                            bully = this.y + 10;
+                            break;
+                        case "right":
+                            bullx = this.x + 30;
+                            bully = this.y + 10;
+                            break;
+                    }
+                    myBullet[0] = new component(_sizebullet, _sizebullet, "", bullx, bully, "bullet");
+                    if (lineStatus == 1) {
+                        writeData("bullet", userId, this.x, this.y);
+                        writeShotStatus(true);
+                    }
                 }
             }
         }
-
         function updateGameArea() {
-            //var newx = this.bullx, newy = this.bully;
-            // myGameArea.frameNo += 1;
-            /*if (myGamePiece.crashWith(1)) {
-            }*/
+            ctx.drawImage(cacheCanvas, 0, 0);
             myGameArea.clear(myGamePiece.x,myGamePiece.y,32,32);
-            for (i = 0; i < myBullet.length; i += 1) {
-                if (userId != "" && guestId != "" && lineStatus == 1) {
-                    writeData("bullet", userId, myBullet[i].x ,myBullet[i].y);
-                }
-                myGameArea.clear(myBullet[i].x, myBullet[i].y, 8, 8);
-                switch (eventHold) {
+            if (myBullet.length != 0) {
+                myBullet[0].hitBorder(2);
+                if (!bulletHitBorder) myGameArea.clear(myBullet[0].x, myBullet[0].y, _sizebullet, _sizebullet);
+                switch (recordDirectionOfBullet) {
                     case "up":
-                        myBullet[i].speedX = 0;
-                        myBullet[i].speedY = -10;
-                        recordDirectionOfBullet = eventHold;
+                        myBullet[0].speedX = 0;
+                        myBullet[0].speedY = -10;
                         break;
                     case "down":
-                        myBullet[i].speedX = 0;
-                        myBullet[i].speedY = 10;
-                        recordDirectionOfBullet = eventHold;
+                        myBullet[0].speedX = 0;
+                        myBullet[0].speedY = 10;
                         break;
                     case "left":
-                        myBullet[i].speedX = -10;
-                        myBullet[i].speedY = 0;
-                        recordDirectionOfBullet = eventHold;
+                        myBullet[0].speedX = -10;
+                        myBullet[0].speedY = 0;
                         break;
                     case "right":
-                        myBullet[i].speedX = 10;
-                        myBullet[i].speedY = 0;
-                        recordDirectionOfBullet = eventHold;
+                        myBullet[0].speedX = 10;
+                        myBullet[0].speedY = 0;
                         break;
                 }
-                myBullet[i].newPos(2);
-                if (!hasAlreadyShot) break;
-                if (bulletHit) {
-                    bulletHit = false;
-                    break;
+                if (lineStatus == 1) writeBulletTraject(myBullet[0].speedX, myBullet[0].speedY);
+                myBullet[0].newPos(2);
+                if (bulletHitBorder) bulletHitBorder = false;
+                if (myBullet.length != 0) myBullet[0].update();
+            }
+            if (readShotStatus() == true && lineStatus == 1) {
+                var session = {
+                    sx: readBulletTraject()[0],
+                    sy: readBulletTraject()[1],
+                    x: readBulletTraject()[2],
+                    y: readBulletTraject()[3]
+                };
+                //myGameArea.clear(session.x,session.y,_sizebullet,_sizebullet);
+                if (myGameArea.frameNo == 0) {
+                    guestBullet[0] = new component(_sizebullet,_sizebullet,"",session.x,session.y,"bullet2");
+                    myGameArea.frameNo += 1;
                 }
-                myBullet[i].update();
+                else {
+                    myGameArea.clear(guestBullet[0].x,guestBullet[0].y, _sizebullet, _sizebullet);
+                    guestBullet[0] = new component(_sizebullet, _sizebullet, "", guestBullet[0].x, guestBullet[0].y, "bullet2");
+                }
+                guestBullet[0].speedX = session.sx;
+                guestBullet[0].speedY = session.sy;
+                guestBullet[0].newPos(3);
+                guestBullet[0].update();
             }
             myGamePiece.newPos(1);
             myGamePiece.update();
-            if (userId != "" && guestId != "" && lineStatus == 1) {
+            if (lineStatus == 1) {
                 writeData("tank", userId, myGamePiece.x, myGamePiece.y);
-                myGameArea.clear(myGamePiece2.x,myGamePiece2.y,32,32);
+                myGameArea.clear(myGamePiece2.x,myGamePiece2.y, _sizetank, _sizetank);
                 myGamePiece2 = new component(_sizetank, _sizetank, "", readData()[0], readData()[1], "tank2");
                 myGamePiece2.update();
             }
-        }
-        function everyInterval(n) {
-            if (myGameArea.frameNo % n == 0) return true;
-            return false;
         }
         function up() {
             myGamePiece.speedY = -1;
@@ -375,16 +451,7 @@
             eventLog = "right";
         }
         function shot() {
-            var shotInterval;
-            if (!hasAlreadyShot) {
-                hasAlreadyShot = true;
-                hasDirection = false;
-                shotInterval = setTimeout(function () {
-                    hasAlreadyShot = false;
-                }, 1000);
-                myGamePiece.shotBullet(myGamePiece.x, myGamePiece.y);
-            }
-
+            myGamePiece.shotBullet();
         }
         function clearmove() {
             myGamePiece.speedX = 0;
