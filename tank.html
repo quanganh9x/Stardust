@@ -61,7 +61,7 @@
         var lineStatus = 0;
         //
 
-        $(document).ready(function(){
+        document.addEventListener("DOMContentLoaded", function(event) {
             getMapDetails(1);
             init();
             startGame();
@@ -135,7 +135,6 @@
             }
             return dataGuest;
         }
-        funct
         function setUsername() {
             userId = document.getElementById("usernameForFirebase").value;
             guestId = document.getElementById("guestForFirebase").value;
