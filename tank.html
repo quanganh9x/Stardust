@@ -12,112 +12,157 @@
             background-color: black;
         }
     </style>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <!-- <link rel="prefetch" href="image.png"> -->
+    <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase-database.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="imgRender.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAN_4NrplOO6g5VqzQI535ACfupwgs8maA",
+            authDomain: "quanganh9x-tank-worlds.firebaseapp.com",
+            databaseURL: "https://quanganh9x-tank-worlds.firebaseio.com",
+            projectId: "quanganh9x-tank-worlds",
+            storageBucket: "",
+            messagingSenderId: "428762755077"
+        };
+        firebase.initializeApp(config);
+    </script>
     <script>
 
-        var myGamePiece;
-        var curtain = [{x: 0, y: 0, m: 32*16, n: 16}, {x: 0, y: 0, m: 32, n: 32*14}, {x: 0, y: 32*13.5, m: 32*16, n: 16},{x: 32*14, y: 0, m: 32*3, n: 32*14},];
-        var bricks = [];
-        var brickBlock = [];
-        var steel = [];
-        var steelBlock = [];
-        var bushes = [];
-        var waterzone = [];
-        var ahihi = [];
-        var myScore;
+        var cacheCanvas = document.createElement("canvas");
+        var define = {"unit":32, "tile": 16};
+        var firebaseData = firebase.database(); // initialization for firebase
+        var myGamePiece, myGamePiece2, myGamePiece3, myGamePiece4; // 4 players - in development
+        var curtain = [{x: 0, y: 0, m: 32*16, n: 16}, {x: 0, y: 0, m: 32, n: 32*14}, {x: 0, y: 32*13.5, m: 32*16, n: 16},{x: 32*14, y: 0, m: 32*3, n: 32*14},], curtainBlock = [];
+        var bricks = [], brickBlock = [];
+        var steel = [], steelBlock = [];
+        var bushes = [], bushesBlock = [];
+        var water = [], waterBlock = [];
+        var base = [], baseBlock;
+        var ctx;
+        var myLife = 3; // not yet used
         var myBullet = [];
         var hasAlreadyShot = false;
-        var eventLog = "up";
-        var eventHold = "up";
+        var eventLog = "up", eventHold = "up";
         var bulletHit;
-        var recordDirection = "up";
-        var _sizeblock = 32/2;
+        var recordDirectionOfBullet = "up";
+        var _sizeblock = 16;
         var _sizetank = 32;
         var _sizebullet = 8;
+        // user information, used by Firebase
+        var userId = "";
+        var guestId = "";
+        var lineStatus = 0;
+        //
 
-        function getMapDetails(mapid) {
-            if (mapid == 1) {
-                bricks = [{x:208,y:416},{x:208,y:400},{x:208,y:384},{x:224,y:384},{x:240,y:384},{x:256,y:384},{x:256,y:400},{x:256,y:416},{x:64,y:368},{x:80,y:368},{x:64,y:384},{x:80,y:384},{x:64,y:336},{x:80,y:336},{x:64,y:352},{x:80,y:352},{x:64,y:304},{x:80,y:304},{x:64,y:320},{x:80,y:320},{x:128,y:304},{x:144,y:304},{x:128,y:320},{x:144,y:320},{x:128,y:336},{x:144,y:336},{x:128,y:352},{x:144,y:352},{x:128,y:368},{x:144,y:368},{x:128,y:384},{x:144,y:384},{x:192,y:304},{x:208,y:304},{x:192,y:320},{x:208,y:320},{x:192,y:272},{x:208,y:272},{x:192,y:288},{x:208,y:288},{x:224,y:272},{x:240,y:272},{x:224,y:288},{x:240,y:288},{x:256,y:272},{x:272,y:272},{x:256,y:288},{x:272,y:288},{x:256,y:304},{x:272,y:304},{x:256,y:320},{x:272,y:320},{x:320,y:368},{x:336,y:368},{x:320,y:384},{x:336,y:384},{x:320,y:336},{x:336,y:336},{x:320,y:352},{x:336,y:352},{x:320,y:304},{x:336,y:304},{x:320,y:320},{x:336,y:320},{x:384,y:304},{x:400,y:304},{x:384,y:320},{x:400,y:320},{x:384,y:336},{x:400,y:336},{x:384,y:352},{x:400,y:352},{x:384,y:368},{x:400,y:368},{x:384,y:384},{x:400,y:384},{x:192,y:336},{x:208,y:336},{x:256,y:336},{x:272,y:336},{x:128,y:288},{x:144,y:288},{x:64,y:288},{x:80,y:288},{x:320,y:288},{x:336,y:288},{x:384,y:288},{x:400,y:288},{x:256,y:256},{x:272,y:256},{x:192,y:256},{x:208,y:256},{x:352,y:240},{x:368,y:240},{x:320,y:240},{x:336,y:240},{x:96,y:240},{x:112,y:240},{x:128,y:240},{x:144,y:240},{x:32,y:224},{x:48,y:224},{x:96,y:224},{x:112,y:224},{x:128,y:224},{x:144,y:224},{x:320,y:224},{x:336,y:224},{x:352,y:224},{x:368,y:224},{x:416,y:224},{x:432,y:224},{x:192,y:208},{x:208,y:208},{x:256,y:208},{x:272,y:208},{x:256,y:192},{x:272,y:192},{x:192,y:192},{x:208,y:192},{x:128,y:176},{x:144,y:176},{x:64,y:176},{x:80,y:176},{x:320,y:176},{x:336,y:176},{x:384,y:176},{x:400,y:176},{x:256,y:144},{x:272,y:144},{x:192,y:144},{x:208,y:144},{x:128,y:144},{x:144,y:144},{x:128,y:160},{x:144,y:160},{x:64,y:144},{x:80,y:144},{x:64,y:160},{x:80,y:160},{x:64,y:112},{x:80,y:112},{x:64,y:128},{x:80,y:128},{x:64,y:80},{x:80,y:80},{x:64,y:96},{x:80,y:96},{x:64,y:48},{x:80,y:48},{x:64,y:64},{x:80,y:64},{x:128,y:48},{x:144,y:48},{x:128,y:64},{x:144,y:64},{x:128,y:80},{x:144,y:80},{x:128,y:96},{x:144,y:96},{x:128,y:112},{x:144,y:112},{x:128,y:128},{x:144,y:128},{x:192,y:112},{x:208,y:112},{x:192,y:128},{x:208,y:128},{x:192,y:80},{x:208,y:80},{x:192,y:96},{x:208,y:96},{x:192,y:48},{x:208,y:48},{x:192,y:64},{x:208,y:64},{x:256,y:48},{x:272,y:48},{x:256,y:64},{x:272,y:64},{x:256,y:80},{x:272,y:80},{x:256,y:96},{x:272,y:96},{x:256,y:112},{x:272,y:112},{x:256,y:128},{x:272,y:128},{x:320,y:144},{x:336,y:144},{x:320,y:160},{x:336,y:160},{x:320,y:112},{x:336,y:112},{x:320,y:128},{x:336,y:128},{x:320,y:80},{x:336,y:80},{x:320,y:96},{x:336,y:96},{x:320,y:48},{x:336,y:48},{x:320,y:64},{x:336,y:64},{x:384,y:48},{x:400,y:48},{x:384,y:64},{x:400,y:64},{x:384,y:80},{x:400,y:80},{x:384,y:96},{x:400,y:96},{x:384,y:112},{x:400,y:112},{x:384,y:128},{x:400,y:128},{x:384,y:144},{x:400,y:144},{x:384,y:160},{x:400,y:160}];
-                steel = [{x:32,y:240},{x:48,y:240},{x:416,y:240},{x:432,y:240},{x:224,y:112},{x:240,y:112},{x:224,y:128},{x:240,y:128}];
-                ahihi = [{x:224,y:400}];
-            }
-        }
-        function getRandNum(max, min) {
-            return Math.floor((Math.random()) * (max - min)) + min;
-        }
-        function startGame() {
+        $(document).ready(function(){
             getMapDetails(1);
-            myGamePiece = new component(_sizetank, _sizetank, "", 50, 250, "tank");
-            for (i=0;i<bricks.length;i+=1) {
-                brickBlock.push(new component(_sizeblock, _sizeblock, "", bricks[i].x, bricks[i].y, "bricks"));
+            init();
+            startGame();
+        });
+
+        // these belong to Firebase. pls not change for a clean game!
+        function writeData(userId, x, y) {
+            if (lineStatus == 1) {
+                firebaseData.ref('players/' + userId).set({
+                    x: x,
+                    y: y
+                });
             }
-            for (i=0;i<steel.length;i+=1) {
-                steelBlock.push(new component(_sizeblock, _sizeblock, "", steel[i].x, steel[i].y, "steel"));
-            }
-            myScore = new component("15px", "Consolas", "black", 400, 40, "score");
-            myGameArea.start();
         }
+        function readData() {
+            var dataGuest = [];
+            if (lineStatus == 1) {
+                var saveX = firebase.database().ref('players/' + guestId + '/x');
+                saveX.on('value', function(snapshot) {
+                    dataGuest[0] = snapshot.val();
+                });
+                var saveY = firebase.database().ref('players/' + guestId + '/y');
+                saveY.on('value', function(snapshot) {
+                    dataGuest[1] = snapshot.val();
+                });
+                var saveDir = firebase.database().ref('players/' + guestId + '/d');
+                saveDir.on('value', function(snapshot) {
+                    dataGuest[2] = snapshot.val();
+                });
+            }
+            return dataGuest;
+        }
+        function setUsername() {
+            userId = document.getElementById("usernameForFirebase").value;
+            guestId = document.getElementById("guestForFirebase").value;
+            if (userId != "" && guestId != "") {
+                document.getElementById("modeFirebase").innerHTML = "Online";
+                document.getElementById("btnUsername").setAttribute("disabled","");
+                lineStatus = 1;
+            }
+            else {
+                alert("You havent specify userId! Please retype if you want to play online");
+                document.getElementById("modeFirebase").innerHTML = "Offline";
+                lineStatus = 0;
+            }
+        }
+        // end firebase
 
         var myGameArea = {
             canvas : document.createElement("canvas"),
             start : function() {
                 var FPS = 50;
-                this.canvas.width = 32*16;
-                this.canvas.height = 32*14;
+                this.canvas.width = define.unit*16;
+                this.canvas.height = define.unit*14;
                 this.context = this.canvas.getContext("2d");
+                ctx = this.context;
+                ctx.drawImage(cacheCanvas, 0, 0);
                 document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-                this.interval = setInterval(updateGameArea, 1000 / FPS);
+                this.frameNo = 0; // not yet used - will be implemented for security purpose
+                this.interval = setInterval(updateGameArea, 1000 / FPS); // 50fps
             },
-            clear : function() {
-                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            clear : function(x,y,m,n) {
+                this.context.clearRect(x, y, m, n);
             }
         }
 
-        var getImage = function(event,type) {
-            var img = new Image();
-            if (type == "tank") {
-                switch (event) {
-                    case "up":
-                        img.src = "tankup.png";
-                        break;
-                    case "down":
-                        img.src = "tankdown.png";
-                        break;
-                    case "left":
-                        img.src = "tankleft.png";
-                        break;
-                    case "right":
-                        img.src = "tankright.png";
-                        break;
-                    default:
-                        img.src = "tankup.png";
-                }
-            } else if (type == "bullet") {
-                switch (event) {
-                    case "up":
-                        img.src = "bulletup.png";
-                        break;
-                    case "down":
-                        img.src = "bulletdown.png";
-                        break;
-                    case "left":
-                        img.src = "bulletleft.png";
-                        break;
-                    case "right":
-                        img.src = "bulletright.png";
-                        break;
-                    default:
-                        img.src = "bulletup.png";
-                }
-            } else if (type == "bricks") {
-                img.src = "brick.png";
-            } else if (type == "steel") {
-                img.src = "steel.png";
-            } else if (type == "trees") {
-                img.src = "trees.png";
-            } else if (type == "water") {
-                img.src = "water.png";
+        // canvas rendering
+        function getMapDetails(mapid) {
+            if (mapid == 1) {
+                bricks.push({x:208,y:416},{x:208,y:400},{x:208,y:384},{x:224,y:384},{x:240,y:384},{x:256,y:384},{x:256,y:400},{x:256,y:416},{x:64,y:368},{x:80,y:368},{x:64,y:384},{x:80,y:384},{x:64,y:336},{x:80,y:336},{x:64,y:352},{x:80,y:352},{x:64,y:304},{x:80,y:304},{x:64,y:320},{x:80,y:320},{x:128,y:304},{x:144,y:304},{x:128,y:320},{x:144,y:320},{x:128,y:336},{x:144,y:336},{x:128,y:352},{x:144,y:352},{x:128,y:368},{x:144,y:368},{x:128,y:384},{x:144,y:384},{x:192,y:304},{x:208,y:304},{x:192,y:320},{x:208,y:320},{x:192,y:272},{x:208,y:272},{x:192,y:288},{x:208,y:288},{x:224,y:272},{x:240,y:272},{x:224,y:288},{x:240,y:288},{x:256,y:272},{x:272,y:272},{x:256,y:288},{x:272,y:288},{x:256,y:304},{x:272,y:304},{x:256,y:320},{x:272,y:320},{x:320,y:368},{x:336,y:368},{x:320,y:384},{x:336,y:384},{x:320,y:336},{x:336,y:336},{x:320,y:352},{x:336,y:352},{x:320,y:304},{x:336,y:304},{x:320,y:320},{x:336,y:320},{x:384,y:304},{x:400,y:304},{x:384,y:320},{x:400,y:320},{x:384,y:336},{x:400,y:336},{x:384,y:352},{x:400,y:352},{x:384,y:368},{x:400,y:368},{x:384,y:384},{x:400,y:384},{x:192,y:336},{x:208,y:336},{x:256,y:336},{x:272,y:336},{x:128,y:288},{x:144,y:288},{x:64,y:288},{x:80,y:288},{x:320,y:288},{x:336,y:288},{x:384,y:288},{x:400,y:288},{x:256,y:256},{x:272,y:256},{x:192,y:256},{x:208,y:256},{x:352,y:240},{x:368,y:240},{x:320,y:240},{x:336,y:240},{x:96,y:240},{x:112,y:240},{x:128,y:240},{x:144,y:240},{x:32,y:224},{x:48,y:224},{x:96,y:224},{x:112,y:224},{x:128,y:224},{x:144,y:224},{x:320,y:224},{x:336,y:224},{x:352,y:224},{x:368,y:224},{x:416,y:224},{x:432,y:224},{x:192,y:208},{x:208,y:208},{x:256,y:208},{x:272,y:208},{x:256,y:192},{x:272,y:192},{x:192,y:192},{x:208,y:192},{x:128,y:176},{x:144,y:176},{x:64,y:176},{x:80,y:176},{x:320,y:176},{x:336,y:176},{x:384,y:176},{x:400,y:176},{x:256,y:144},{x:272,y:144},{x:192,y:144},{x:208,y:144},{x:128,y:144},{x:144,y:144},{x:128,y:160},{x:144,y:160},{x:64,y:144},{x:80,y:144},{x:64,y:160},{x:80,y:160},{x:64,y:112},{x:80,y:112},{x:64,y:128},{x:80,y:128},{x:64,y:80},{x:80,y:80},{x:64,y:96},{x:80,y:96},{x:64,y:48},{x:80,y:48},{x:64,y:64},{x:80,y:64},{x:128,y:48},{x:144,y:48},{x:128,y:64},{x:144,y:64},{x:128,y:80},{x:144,y:80},{x:128,y:96},{x:144,y:96},{x:128,y:112},{x:144,y:112},{x:128,y:128},{x:144,y:128},{x:192,y:112},{x:208,y:112},{x:192,y:128},{x:208,y:128},{x:192,y:80},{x:208,y:80},{x:192,y:96},{x:208,y:96},{x:192,y:48},{x:208,y:48},{x:192,y:64},{x:208,y:64},{x:256,y:48},{x:272,y:48},{x:256,y:64},{x:272,y:64},{x:256,y:80},{x:272,y:80},{x:256,y:96},{x:272,y:96},{x:256,y:112},{x:272,y:112},{x:256,y:128},{x:272,y:128},{x:320,y:144},{x:336,y:144},{x:320,y:160},{x:336,y:160},{x:320,y:112},{x:336,y:112},{x:320,y:128},{x:336,y:128},{x:320,y:80},{x:336,y:80},{x:320,y:96},{x:336,y:96},{x:320,y:48},{x:336,y:48},{x:320,y:64},{x:336,y:64},{x:384,y:48},{x:400,y:48},{x:384,y:64},{x:400,y:64},{x:384,y:80},{x:400,y:80},{x:384,y:96},{x:400,y:96},{x:384,y:112},{x:400,y:112},{x:384,y:128},{x:400,y:128},{x:384,y:144},{x:400,y:144},{x:384,y:160},{x:400,y:160});
+                steel.push({x:32,y:240},{x:48,y:240},{x:416,y:240},{x:432,y:240},{x:224,y:112},{x:240,y:112},{x:224,y:128},{x:240,y:128});
+                base.push({x:224,y:400});
             }
-            return img;
+        }
+
+        function draw(cacheCtx) {
+            for (i = 0; i < bricks.length; i += 1) {
+                cacheCtx.drawImage(imgRender.getImage("", "brick"), bricks[i].x, bricks[i].y, _sizeblock, _sizeblock);
+            }
+            for (i = 0; i < steel.length; i += 1) {
+                cacheCtx.drawImage(imgRender.getImage("", "steel"), steel[i].x, steel[i].y, _sizeblock, _sizeblock);
+            }
+            i=0;
+            for (i = 0; i < curtain.length; i += 1) {
+                cacheCtx.fillStyle = "#808080";
+                cacheCtx.fillRect(curtain[i].x, curtain[i].y, curtain[i].m, curtain[i].n);
+            }
+        }
+
+        function startGame() {
+            myGamePiece = new component(_sizetank, _sizetank, "", 50, 32*14-16-32, "tank");
+            //myGamePiece2 = new component(_sizetank, _sizetank, "", 50, 400, "tank");
+            myScore = new component("15px", "Consolas", "black", 400, 40, "score");
+            myGameArea.start();
+        }
+
+        function init() {
+            var cacheCtx;
+            cacheCanvas.width = define.unit*16;
+            cacheCanvas.height = define.unit*14;
+            cacheCtx = cacheCanvas.getContext("2d");
+            draw(cacheCtx);
+            // lets start
         }
 
         function component(width, height, color, x, y, type) {
@@ -132,34 +177,21 @@
             this.bullx = 0;
             this.bully = 0;
             this.update = function() {
-                ctx = myGameArea.context;
                 switch (this.type) {
                     case "score":
-                    ctx.font = this.width + " " + this.height;
-                    ctx.fillStyle = color;
-                    ctx.fillText(this.text, this.x, this.y);
-                    break;
+                        ctx.font = this.width + " " + this.height;
+                        ctx.fillStyle = color;
+                        ctx.fillText(this.text, this.x, this.y);
+                        break;
                     case "tank":
-                    ctx.drawImage(getImage(eventLog, this.type), this.x, this.y, this.width, this.height);
-                    break;
+                        ctx.drawImage(imgRender.getImage(eventLog, this.type), this.x, this.y, this.width, this.height);
+                        break;
                     case "bullet":
-                    ctx.drawImage(getImage(eventHold, this.type), this.x, this.y, this.width, this.height);
-                    break;
-                    case "bricks":
-                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
-                    break;
-                    case "trees":
-                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
-                    break;
-                    case "water":
-                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
-                    break;
-                    case "steel":
-                    ctx.drawImage(getImage("", this.type), this.x, this.y, this.width, this.height);
-                    break;
+                        ctx.drawImage(imgRender.getImage(eventHold, this.type), this.x, this.y, this.width, this.height);
+                        break;
                     default:
-                    ctx.fillStyle = color;
-                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                        ctx.fillStyle = color;
+                        ctx.fillRect(this.x, this.y, this.width, this.height);
                 }
             }
             this.newPos = function(type) {
@@ -176,18 +208,28 @@
                     if (this.x < 32) this.x = 32;
                     else if (this.x > widthBorder) this.x = widthBorder;
                 } else if (type == 2) {
-                    if (this.x < 0 || this.x > widthBorder || this.y < 0 || this.y > heightBorder) {
+                    if (this.x < 32 || this.x > widthBorder || this.y < 16 || this.y > heightBorder) {
+                        myBullet.splice(0,myBullet.length);
                         bulletHit = true;
                     }
                 }
             }
-            this.crashWith = function(type, obj) {
+            /*this.crashWith = function(type) {
                 if (type == 1) {
-                    var x_leftUpCorner = this.x;
-                    var x_rightUp = this.x + _sizetank;
-                    var y_leftDown = this.x
+                    var leftUpCornerX = this.x; var UpY = this.y;
+                    var rightUpCornerX = this.x + _sizetank;
+                    var leftDownCornerY = this.y + _sizetank; var DownY = this.y + _sizetank;
+                    var rightDownCornerX = this.x + _sizetank;
+                    switch (eventLog) {
+                        case "up":
+                            for (i=0;i<bricks.length;i++) {
+                                if (this.y > bricks[i].y && this.y < bricks[i].y + define.unit) return true;
+                            }
+                            break;
+                    }
                 }
-            }
+             return false;
+            }*/
             this.shotBullet = function(ex, ey) {
                 if (!hasDirection) eventHold = eventLog;
                 hasDirection = true;
@@ -213,53 +255,35 @@
                 }
             }
         }
+
         function updateGameArea() {
             //var newx = this.bullx, newy = this.bully;
-            var brickBlock = [], steelBlock = [], curtainBlock = [];
-            for (i = 0; i < bricks.length; i += 1) {
-                if (myGamePiece.crashWith(bricks[i])) {
-                    return;
-                }
-            }
-            myGameArea.clear();
-            myGameArea.frameNo += 1;
-            if (myGameArea.frameNo == 1) {
-                getMapDetails(1);
-                myBullet.push(new component(_sizebullet, _sizebullet, "", this.bullx, this.bully, "bullet"));
-            }
-            for (i=0;i<bricks.length;i+=1) {
-                brickBlock.push(new component(_sizeblock, _sizeblock, "", bricks[i].x, bricks[i].y, "bricks"));
-                brickBlock[i].update();
-            }
-            for (i=0;i<steel.length;i+=1) {
-                steelBlock.push(new component(_sizeblock, _sizeblock, "", steel[i].x, steel[i].y, "steel"));
-                steelBlock[i].update();
-            }
-            for (i=0;i<curtain.length;i+=1) {
-                curtainBlock.push(new component(curtain[i].m, curtain[i].n, "#808080", curtain[i].x, curtain[i].y));
-                curtainBlock[i].update();
-            }
+            // myGameArea.frameNo += 1;
+            /*if (myGamePiece.crashWith(1)) {
+            }*/
+            myGameArea.clear(myGamePiece.x,myGamePiece.y,32,32);
             for (i = 0; i < myBullet.length; i += 1) {
+                myGameArea.clear(myBullet[i].x, myBullet[i].y, 8, 8);
                 switch (eventHold) {
                     case "up":
                         myBullet[i].speedX = 0;
                         myBullet[i].speedY = -10;
-                        recordDirection = eventHold;
+                        recordDirectionOfBullet = eventHold;
                         break;
                     case "down":
                         myBullet[i].speedX = 0;
                         myBullet[i].speedY = 10;
-                        recordDirection = eventHold;
+                        recordDirectionOfBullet = eventHold;
                         break;
                     case "left":
                         myBullet[i].speedX = -10;
                         myBullet[i].speedY = 0;
-                        recordDirection = eventHold;
+                        recordDirectionOfBullet = eventHold;
                         break;
                     case "right":
                         myBullet[i].speedX = 10;
                         myBullet[i].speedY = 0;
-                        recordDirection = eventHold;
+                        recordDirectionOfBullet = eventHold;
                         break;
                 }
                 myBullet[i].newPos(2);
@@ -272,9 +296,14 @@
             }
             myGamePiece.newPos(1);
             myGamePiece.update();
+            if (userId != "" && guestId != "") {
+                writeData(userId, myGamePiece.x, myGamePiece.y);
+                myGamePiece2 = new component(_sizetank, _sizetank, "", readData()[0], readData()[1], "tank");
+                myGamePiece2.update();
+            }
         }
-        function everyinterval(n) {
-            if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+        function everyInterval(n) {
+            if (myGameArea.frameNo % n == 0) return true;
             return false;
         }
         function up() {
@@ -314,14 +343,18 @@
         }
     </script>
 </head>
-<body onload="startGame()">
+<body>
 <div style="text-align:center;width:320px;">
+    <p>You are in: <span id="modeFirebase">Offline</span> mode</p>
     <button ontouchstart="up()" onmousedown="up()" onmouseup="clearmove()">UP</button><br><br>
     <button ontouchstart="left()" onmousedown="left()" onmouseup="clearmove()">LEFT</button>
     <button ontouchstart="right()" onmousedown="right()" onmouseup="clearmove()">RIGHT</button><br><br>
     <button ontouchstart="down()" onmousedown="down()" onmouseup="clearmove()">DOWN</button>
     <br>
-    <button ontouchstart="shot()" onmousedown="shot()">SHOT</button>
+    <button ontouchstart="shot()" onmousedown="shot()">SHOT</button><br/>
+    <input type="text" id="usernameForFirebase" placeholder="Input your username then click Fucked :)) to play online!"/>
+    <button onclick="setUsername()" id="btnUsername">Fucked</button><br/>
+    <input type="text" id="guestForFirebase" placeholder="Use &lt;test&gt;. Input guest username then click Fucked to play with him/her!"/>
 </div>
 </body>
 </html>
