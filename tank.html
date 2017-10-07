@@ -6,6 +6,8 @@
     <style>
         body {
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
         canvas {
             border: 2px solid black;
@@ -63,35 +65,77 @@
             getMapDetails(1);
             init();
             startGame();
+            window.addEventListener('keydown', function(event) {
+                var keyPressed = event.keyCode;
+                switch (keyPressed) {
+                    case 37:
+                        left();
+                        break;
+                    case 38:
+                        up();
+                        break;
+                    case 39:
+                        right();
+                        break;
+                    case 40:
+                        down();
+                        break;
+                    case 32:
+                        shot();
+                        break;
+                }
+            }, false);
+            window.addEventListener('keyup', function(event) {
+                var keyReleased = event.keyCode;
+                if (keyReleased <= 40 && keyReleased >= 37)
+                    clearmove();
+            }, false);
         });
 
+        // event hooking
+
+        // dont tamper if you dont want to fuck up the game
+
         // these belong to Firebase. pls not change for a clean game!
-        function writeData(userId, x, y) {
+        function writeData(type, userId, x, y) {
             if (lineStatus == 1) {
-                firebaseData.ref('players/' + userId).set({
-                    x: x,
-                    y: y
-                });
+                switch (type) {
+                    case "tank":
+                        firebaseData.ref("players/" + userId + "/tank").set({
+                            x: x,
+                            y: y,
+                            d: eventLog
+                        });
+                        break;
+                    case "bullet":
+                        firebaseData.ref("players/" + userId + "/bullet").set({
+                            x: x,
+                            y: y,
+                            d: recordDirectionOfBullet
+                        });
+                        break;
+                }
             }
         }
         function readData() {
             var dataGuest = [];
             if (lineStatus == 1) {
-                var saveX = firebase.database().ref('players/' + guestId + '/x');
+                var saveX = firebase.database().ref('players/' + guestId + '/tank/x');
                 saveX.on('value', function(snapshot) {
                     dataGuest[0] = snapshot.val();
                 });
-                var saveY = firebase.database().ref('players/' + guestId + '/y');
+                var saveY = firebase.database().ref('players/' + guestId + '/tank/y');
                 saveY.on('value', function(snapshot) {
                     dataGuest[1] = snapshot.val();
                 });
-                var saveDir = firebase.database().ref('players/' + guestId + '/d');
+                var saveDir = firebase.database().ref('players/' + guestId + '/tank/d');
                 saveDir.on('value', function(snapshot) {
                     dataGuest[2] = snapshot.val();
                 });
             }
             return dataGuest;
         }
+        funct
         function setUsername() {
             userId = document.getElementById("usernameForFirebase").value;
             guestId = document.getElementById("guestForFirebase").value;
@@ -99,12 +143,14 @@
                 document.getElementById("modeFirebase").innerHTML = "Online";
                 document.getElementById("btnUsername").setAttribute("disabled","");
                 lineStatus = 1;
+                myGamePiece2 = new component(_sizetank, _sizetank, "", readData()[0], readData()[1], "tank2");
             }
             else {
                 alert("You havent specify userId! Please retype if you want to play online");
                 document.getElementById("modeFirebase").innerHTML = "Offline";
                 lineStatus = 0;
             }
+
         }
         // end firebase
 
@@ -186,6 +232,9 @@
                     case "tank":
                         ctx.drawImage(imgRender.getImage(eventLog, this.type), this.x, this.y, this.width, this.height);
                         break;
+                    case "tank2":
+                        ctx.drawImage(imgRender.getImage(readData()[2], this.type), this.x, this.y, this.width, this.height);
+                        break;
                     case "bullet":
                         ctx.drawImage(imgRender.getImage(eventHold, this.type), this.x, this.y, this.width, this.height);
                         break;
@@ -263,6 +312,9 @@
             }*/
             myGameArea.clear(myGamePiece.x,myGamePiece.y,32,32);
             for (i = 0; i < myBullet.length; i += 1) {
+                if (userId != "" && guestId != "" && lineStatus == 1) {
+                    writeData("bullet", userId, myBullet[i].x ,myBullet[i].y);
+                }
                 myGameArea.clear(myBullet[i].x, myBullet[i].y, 8, 8);
                 switch (eventHold) {
                     case "up":
@@ -296,9 +348,10 @@
             }
             myGamePiece.newPos(1);
             myGamePiece.update();
-            if (userId != "" && guestId != "") {
-                writeData(userId, myGamePiece.x, myGamePiece.y);
-                myGamePiece2 = new component(_sizetank, _sizetank, "", readData()[0], readData()[1], "tank");
+            if (userId != "" && guestId != "" && lineStatus == 1) {
+                writeData("tank", userId, myGamePiece.x, myGamePiece.y);
+                myGameArea.clear(myGamePiece2.x,myGamePiece2.y,32,32);
+                myGamePiece2 = new component(_sizetank, _sizetank, "", readData()[0], readData()[1], "tank2");
                 myGamePiece2.update();
             }
         }
@@ -341,7 +394,7 @@
     </script>
 </head>
 <body>
-<div style="text-align:center;width:320px;">
+<div style="text-align:center; width:320px;">
     <p>You are in: <span id="modeFirebase">Offline</span> mode</p>
     <button ontouchstart="up()" onmousedown="up()" onmouseup="clearmove()">UP</button><br><br>
     <button ontouchstart="left()" onmousedown="left()" onmouseup="clearmove()">LEFT</button>

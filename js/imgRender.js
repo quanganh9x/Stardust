@@ -26,7 +26,8 @@ var imgRender = (function() {
 
     return {
         getImage: function (event,type) {
-            name = type + event;
+            if (type == "tank2") name = "tank"+event;
+            else name = type + event;
             return images[name];
         },
         getLoadingProgress: function () {
