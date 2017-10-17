@@ -11,7 +11,8 @@ var imgRender = (function() {
         bulletright: null,
 
         brick: null,
-        steel: null
+        steel: null,
+        base: null
     };
 
     var imagesCount = images.length;
