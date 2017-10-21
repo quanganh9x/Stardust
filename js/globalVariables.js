@@ -3,7 +3,8 @@ var define = {
     tile: 16,
     _sizeblock: 16,
     _sizetank: 32,
-    _sizebullet: 8
+    _sizebullet: 8,
+    _smooth: 2
 };
 
 var loaded = {

@@ -6,16 +6,24 @@ function Tank(x, y) {
     this.direction = "up";
     this.hasAlreadyShot = false;
     this.life = 3;
-    this.Event = {};
+    this.mapBlocks = [];
+    this.restrictUp = 0;
+    this.restrictDown = 0;
+    this.restrictLeft = 0;
+    this.restrictRight = 0;
 }
 
-Tank.prototype.event = function () {
 
+Tank.prototype.mapInit = function () {
+    var rendered = new mapRender();
+    rendered.getMap(1);
+    this.mapBlocks = rendered.getBlocks(1);
 };
 
 Tank.prototype.init = function () {
     loaded.Tank = true;
     this.move();
+    this.mapInit();
 };
 
 Tank.prototype.draw = function (ctx) {
@@ -29,8 +37,10 @@ Tank.prototype.shot = function () {
         var setThis = this; // hotfix for settimeout() function
         setTimeout(function () {
             setThis.hasAlreadyShot = false;
+        },1000);
+        setTimeout(function () {
             firebasePort.writeShotStatus("clear");
-        }, 2000);
+        },1500);
         bulletTraject = new Bullet(this.x, this.y, this.direction);
         firebasePort.writeData("bullet");
         bulletTraject.init();
@@ -67,9 +77,52 @@ Tank.prototype.move = function () {
 
 Tank.prototype.newPos = function () {
     var components = new coreComponents(this.x, this.y, this.speedX, this.speedY);
-    this.x = components.newPosX();
-    this.y = components.newPosY();
-    this.hitBorder();
+    if (this.hitObstacles() == 0) {
+        this.x = components.newPosX();
+        this.y = components.newPosY();
+        this.hitBorder();
+    } else return;
+};
+
+Tank.prototype.hitObstacles = function () {
+    var left = this.x;
+    var up = this.y;
+    var down = this.y + define._sizetank;
+    var right = this.x + define._sizetank;
+    for (var i=0;i<this.mapBlocks.length;i++) {
+        switch (this.direction) {
+            case "up":
+                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth)) {
+                    this.y = this.mapBlocks[i].d;
+                    this.clearMove();
+                    return 1;
+                }
+                break;
+            case "down":
+                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth)) {
+                    this.y = this.mapBlocks[i].u - define._sizetank;
+                    this.clearMove();
+                    return 1;
+                }
+                break;
+            case "left":
+                if ((left < this.mapBlocks[i].r + 1 && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth)) {
+                    this.x = this.mapBlocks[i].r;
+                    this.clearMove();
+
+                    return 1;
+                }
+                break;
+            case "right":
+                if ((right > this.mapBlocks[i].l - 1 && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth)) {
+                    this.x = this.mapBlocks[i].l - define._sizetank;
+                    this.clearMove();
+                    return 1;
+                }
+                break;
+        }
+    }
+    return 0;
 };
 
 Tank.prototype.hitBorder = function () {
@@ -82,20 +135,20 @@ Tank.prototype.hitBorder = function () {
 };
 
 Tank.prototype.up = function () {
-    this.speedY = -1;
-    this.direction = "up";
+        this.speedY = -1;
+        this.direction = "up";
 };
 Tank.prototype.down = function () {
-    this.speedY = 1;
-    this.direction = "down";
+        this.speedY = 1;
+        this.direction = "down";
 };
 Tank.prototype.left = function () {
-    this.speedX = -1;
-    this.direction = "left";
+        this.speedX = -1;
+        this.direction = "left";
 };
 Tank.prototype.right = function () {
-    this.speedX = 1;
-    this.direction = "right";
+        this.speedX = 1;
+        this.direction = "right";
 };
 Tank.prototype.clearMove = function () {
     this.speedX = 0;

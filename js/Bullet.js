@@ -4,12 +4,7 @@ function Bullet(x, y, direction) {
     this.speedX = 0;
     this.speedY = 0;
     this.direction = direction;
-    this.Event = {};
 }
-
-Bullet.prototype.event = function () {
-
-};
 
 Bullet.prototype.init = function () {
     loaded.Bullet = true;
@@ -17,22 +12,22 @@ Bullet.prototype.init = function () {
         case "up":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
             this.y = this.y - define._sizebullet;
-            this.speedY = -10;
+            this.speedY = -7;
             break;
         case "down":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
             this.y = this.y + define._sizetank;
-            this.speedY = 10;
+            this.speedY = 7;
             break;
         case "left":
             this.x = this.x - define._sizebullet;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
-            this.speedX = -10;
+            this.speedX = -7;
             break;
         case "right":
             this.x = this.x + define._sizetank;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
-            this.speedX = 10;
+            this.speedX = 7;
             break;
     }
     firebasePort.writeBulletData();

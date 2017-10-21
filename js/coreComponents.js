@@ -14,3 +14,12 @@ coreComponents.prototype.newPosY = function () {
     return this.y;
 };
 
+coreComponents.prototype.revertPosX = function () {
+    this.x -= this.speedX;
+    return this.x;
+};
+
+coreComponents.prototype.revertPosY = function () {
+    this.y -= this.speedY;
+    return this.y;
+};

@@ -24,26 +24,24 @@ mapRender.prototype.getMap = function (mapid) {
     }
 };
 
-mapRender.prototype.brickx = function () {
-    return this._construct.brick;
+mapRender.prototype.sorting = function (arr) {
+    return arr.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
 };
-mapRender.prototype.bricky = function () {
-    return this._construct.brick;
-};
-
-mapRender.prototype.steelx = function () {
-    return this._construct.steel;
-};
-mapRender.prototype.steely = function () {
-    return this._construct.steel;
+mapRender.prototype.getBlocks = function () {
+    var blocks = [];
+    for (i=0;i<this._construct.brick.length;i++) blocks.push({u: this._construct.brick[i].y, d: this._construct.brick[i].y + define._sizeblock, l: this._construct.brick[i].x, r: this._construct.brick[i].x + define._sizeblock});
+    for (i=0;i<this._construct.steel.length;i++) blocks.push({u: this._construct.steel[i].y, d: this._construct.steel[i].y + define._sizeblock, l: this._construct.steel[i].x, r: this._construct.steel[i].x + define._sizeblock});
+    return blocks;
 };
 
-mapRender.prototype.basex = function () {
-    return this._construct.base;
-};
-mapRender.prototype.basey = function () {
-    return this._construct.base;
-};
+mapRender.prototype.defineBlocks = function (arrBlock) {
+    var blocks = [];
+    for (i=0;i<arrBlock.length;i++) {
+        blocks[i] = true;
+    }
+    return blocks;
+
+}
 
 mapRender.prototype.draw = function (ctx) {
     for (i=0;i<this._construct.brick.length;i += 1) ctx.drawImage(imgRender.getImage("", "brick"), this._construct.brick[i].x, this._construct.brick[i].y, define._sizeblock, define._sizeblock);

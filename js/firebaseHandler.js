@@ -19,6 +19,20 @@ firebaseHandler.prototype.written = function () {
     return this._written;
 };
 
+// user management
+firebaseHandler.prototype.getUser = function () {
+    this._userId = document.getElementById("user1").value;
+    this._guestId = document.getElementById("user2").value;
+    if (this._userId != "" && this._guestId != "") this._status = 1;
+};
+firebaseHandler.prototype.xssProtector = function () {
+
+};
+
+firebaseHandler.prototype.ddosProtector = function () {
+
+};
+// use for joining 2 players
 firebaseHandler.prototype.writeData = function (type) {
     if (this._status == 1) {
         switch (type) {
@@ -91,23 +105,23 @@ firebaseHandler.prototype.readBulletData = function () {
     if (this._status == 1) {
         var saveSpeedX = this._firebaseData.ref('players/' + guestId + '/bullet/traject/sx');
         saveSpeedX.on('value', function(snapshot) {
-            dataGuest[1] = snapshot.val();
+            dataGuest[3] = snapshot.val();
         });
         var saveSpeedY = this._firebaseData.ref('players/' + guestId + '/bullet/traject/sy');
         saveSpeedY.on('value', function(snapshot) {
-            dataGuest[2] = snapshot.val();
+            dataGuest[4] = snapshot.val();
         });
         var saveX = this._firebaseData.ref('players/' + guestId + '/bullet/x');
         saveX.on('value', function(snapshot) {
-            dataGuest[3] = snapshot.val();
+            dataGuest[0] = snapshot.val();
         });
         var saveY = this._firebaseData.ref('players/' + guestId + '/bullet/y');
         saveY.on('value', function(snapshot) {
-            dataGuest[4] = snapshot.val();
+            dataGuest[1] = snapshot.val();
         });
         var saveDir = this._firebaseData.ref('players/' + guestId + '/bullet/d');
         saveDir.on('value', function(snapshot) {
-            dataGuest[5] = snapshot.val();
+            dataGuest[2] = snapshot.val();
         });
     }
     return dataGuest;
