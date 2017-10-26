@@ -5,6 +5,7 @@ function mapRender() {
         base: [],
         curtain: []
     };
+    this._active = [];
 }
 
 mapRender.prototype.getMap = function (mapid) {
@@ -24,25 +25,25 @@ mapRender.prototype.getMap = function (mapid) {
     }
 };
 
-mapRender.prototype.sorting = function (arr) {
-    return arr.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-};
 mapRender.prototype.getBlocks = function () {
     var blocks = [];
     for (i=0;i<this._construct.brick.length;i++) blocks.push({u: this._construct.brick[i].y, d: this._construct.brick[i].y + define._sizeblock, l: this._construct.brick[i].x, r: this._construct.brick[i].x + define._sizeblock});
     for (i=0;i<this._construct.steel.length;i++) blocks.push({u: this._construct.steel[i].y, d: this._construct.steel[i].y + define._sizeblock, l: this._construct.steel[i].x, r: this._construct.steel[i].x + define._sizeblock});
+    this.setActive(blocks);
     return blocks;
 };
 
-mapRender.prototype.defineBlocks = function (arrBlock) {
-    var blocks = [];
-    for (i=0;i<arrBlock.length;i++) {
-        blocks[i] = true;
-    }
-    return blocks;
+mapRender.prototype.setActive = function (arrBlock) {
+    for (i=0;i<arrBlock.length;i++) this._active.push(true);
+};
 
-}
+mapRender.prototype.getActive = function (i) {
+    return this._active[i];
+};
 
+mapRender.prototype.deActive = function (i) {
+    this._active[i] = false;
+};
 mapRender.prototype.draw = function (ctx) {
     for (i=0;i<this._construct.brick.length;i += 1) ctx.drawImage(imgRender.getImage("", "brick"), this._construct.brick[i].x, this._construct.brick[i].y, define._sizeblock, define._sizeblock);
     for (i=0;i<this._construct.steel.length;i += 1) ctx.drawImage(imgRender.getImage("", "steel"), this._construct.steel[i].x, this._construct.steel[i].y, define._sizeblock, define._sizeblock);

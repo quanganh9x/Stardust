@@ -15,9 +15,9 @@ function Tank(x, y) {
 
 
 Tank.prototype.mapInit = function () {
-    var rendered = new mapRender();
-    rendered.getMap(1);
-    this.mapBlocks = rendered.getBlocks(1);
+    this.rendered = new mapRender();
+    this.rendered.getMap(1);
+    this.mapBlocks = this.rendered.getBlocks(1);
 };
 
 Tank.prototype.init = function () {
@@ -92,21 +92,21 @@ Tank.prototype.hitObstacles = function () {
     for (var i=0;i<this.mapBlocks.length;i++) {
         switch (this.direction) {
             case "up":
-                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth)) {
+                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && this.rendered.getActive(i)) {
                     this.y = this.mapBlocks[i].d;
                     this.clearMove();
                     return 1;
                 }
                 break;
             case "down":
-                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth)) {
+                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && this.rendered.getActive(i)) {
                     this.y = this.mapBlocks[i].u - define._sizetank;
                     this.clearMove();
                     return 1;
                 }
                 break;
             case "left":
-                if ((left < this.mapBlocks[i].r + 1 && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth)) {
+                if ((left < this.mapBlocks[i].r + 1 && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && this.rendered.getActive(i)) {
                     this.x = this.mapBlocks[i].r;
                     this.clearMove();
 
@@ -114,7 +114,7 @@ Tank.prototype.hitObstacles = function () {
                 }
                 break;
             case "right":
-                if ((right > this.mapBlocks[i].l - 1 && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth)) {
+                if ((right > this.mapBlocks[i].l - 1 && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && this.rendered.getActive(i)) {
                     this.x = this.mapBlocks[i].l - define._sizetank;
                     this.clearMove();
                     return 1;

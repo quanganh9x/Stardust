@@ -27,9 +27,7 @@ var imgRender = (function() {
 
     return {
         getImage: function (event,type) {
-            if (type == "tank2") name = "tank"+event;
-            else if (type == "bullet2") name = "bullet"+event;
-            else name = type + event;
+            name = type + event;
             return images[name];
         },
         getLoadingProgress: function () {

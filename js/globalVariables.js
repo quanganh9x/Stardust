@@ -9,10 +9,11 @@ var define = {
 
 var loaded = {
     Tank: false,
+    Tank2: false,
     Bullet: false
 };
 
 var FPS = 60;
 
-var myGamePiece;
+var myGamePiece, myGamePiece2;
 var bulletTraject;

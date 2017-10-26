@@ -13,7 +13,5 @@ cacheCanvas.prototype.renderedCanvas = function() {
 };
 
 cacheCanvas.prototype.draw = function() {
-    var rendered = new mapRender();
-    rendered.getMap(1);
     rendered.draw(this.ctx);
 };

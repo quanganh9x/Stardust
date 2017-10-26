@@ -1,3 +1,6 @@
+<?php
+require_once "config.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +11,25 @@
             text-align: center;
             margin: 0;
             padding: 0;
+            height: 100%;
         }
         canvas {
             border: 2px solid black;
             background-color: black;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: bisque;
+        }
+        .overlay {
+            position: fixed;
+            width: 100%;
+            height: 999px;
+            left: 0;
+            top: 0;
+            background-color: black;
+            z-index: 10;
         }
     </style>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
@@ -33,46 +51,51 @@
         var firebasePort = new firebaseHandler(firebaseData);
     </script>
     <script src="js/sceneManager.js"></script>
-    <script src="js/rAFSupport.js"></script>
+    <script src="apis/SmoothMovement.js"></script>
+    <script src="apis/rAFSupport.js"></script>
     <script src="js/Bullet.js"></script>
     <script src="js/cacheCanvas.js"></script>
     <script src="js/coreComponents.js"></script>
     <script src="js/gameStatus.js"></script>
     <script src="js/globalVariables.js"></script>
     <script src="js/imgRender.js"></script>
+    <script src="js/Players.js"></script>
     <script src="js/mapRender.js"></script>
     <script src="js/Tank.js"></script>
+    <!-- <script src="js/hahaIwanttoPlay.js"></script> -->
     <script>
         var myGameArea = new sceneManager();
         var cache = new cacheCanvas();
+        var rendered = new mapRender();
+        rendered.getMap(1);
         var check = false;
         document.addEventListener("DOMContentLoaded", function(event) {
             var cookieStr = document.cookie;
             if (cookieStr == "Y2FjaGVkPTE=") check = true;
-            if (check) {
+            if (!check) {
                 cache.init();
                 myGameArea.init();
-                myGameArea.start();
-            } else {
+                myGameArea.loop();
+            } /*else {
                 myGameArea.welcome();
                 setTimeout(function () {
                     location.reload();
                 },10000);
-            }
+            }*/
         });
     </script>
 </head>
-<body>
+<body onload="fucked()"><div id="beepbloop">
 <!-- <audio autoplay="autoplay">
     <source src="sound/yayyyyyyyy.mp3" />
 </audio> -->
 <div style="text-align:center; width:320px;">
-    <p>You are in: <span id="modeFirebase">Offline</span> mode</p>
-    <br>
-    <input type="text" id="usernameForFirebase" placeholder="Input your username then click Fucked :)) to play online!"/>
-    <button onclick="setUsername()" id="btnUsername">Fucked</button><br/>
-    <input type="text" id="guestForFirebase" placeholder="Use &lt;test&gt;. Input guest username then click Fucked to play with him/her!"/>
+    <p>You are in: <span id="mode">Offline</span> mode</p>
+    <input type="text" id="user1" placeholder="Player 01"/>
+    <input type="text" id="user2" placeholder="Player 02"/>
+    <button onclick="firebasePort.getUser()">Get ?</button>
 </div>
-
+<footer>Copyright &copy; 2017 quanganh9x</footer>
+</div>
 </body>
 </html>

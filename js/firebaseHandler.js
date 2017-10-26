@@ -2,8 +2,8 @@ function firebaseHandler(data) {
     this._firebaseData = data;
     this._players = 2;
     this._status = 1;
-    this._userId = "quanganh9x";
-    this._guestId = "test";
+    this._userId = "test";
+    this._guestId = "quanganh9x";
     this._written = false;
 }
 
@@ -23,7 +23,11 @@ firebaseHandler.prototype.written = function () {
 firebaseHandler.prototype.getUser = function () {
     this._userId = document.getElementById("user1").value;
     this._guestId = document.getElementById("user2").value;
-    if (this._userId != "" && this._guestId != "") this._status = 1;
+    if (this._userId != "" && this._guestId != "") {
+        this._status = 1;
+        var mode = document.getElementById("mode");
+        mode.innerHTML = "<b><color='red'>Online</color></b>";
+    }
 };
 firebaseHandler.prototype.xssProtector = function () {
 
@@ -79,22 +83,22 @@ firebaseHandler.prototype.writeShotStatus = function (type) {
 };
 firebaseHandler.prototype.readTankData = function () {
     var dataGuest = [];
-    if (this._written == true) {
-        var saveLife = this._firebaseData.ref('players/' + guestId + '/tank/life');
-        saveLife.on('value', function(snapshot) {
-            dataGuest[3] = snapshot.val();
-        });
-        var saveX = this._firebaseData.ref('players/' + guestId + '/tank/x');
+    if (this._status == 1) {
+        var saveX = this._firebaseData.ref('players/' + this._guestId + '/tank/x');
         saveX.on('value', function(snapshot) {
             dataGuest[0] = snapshot.val();
         });
-        var saveY = this._firebaseData.ref('players/' + guestId + '/tank/y');
+        var saveY = this._firebaseData.ref('players/' + this._guestId + '/tank/y');
         saveY.on('value', function(snapshot) {
             dataGuest[1] = snapshot.val();
         });
-        var saveDir = this._firebaseData.ref('players/' + guestId + '/tank/d');
+        var saveDir = this._firebaseData.ref('players/' + this._guestId + '/tank/d');
         saveDir.on('value', function(snapshot) {
             dataGuest[2] = snapshot.val();
+        });
+        var saveLife = this._firebaseData.ref('players/' + this._guestId + '/tank/life');
+        saveLife.on('value', function(snapshot) {
+            dataGuest[3] = snapshot.val();
         });
     }
     return dataGuest;
@@ -103,23 +107,23 @@ firebaseHandler.prototype.readTankData = function () {
 firebaseHandler.prototype.readBulletData = function () {
     var dataGuest = [];
     if (this._status == 1) {
-        var saveSpeedX = this._firebaseData.ref('players/' + guestId + '/bullet/traject/sx');
+        var saveSpeedX = this._firebaseData.ref('players/' + this._guestId + '/bullet/traject/sx');
         saveSpeedX.on('value', function(snapshot) {
             dataGuest[3] = snapshot.val();
         });
-        var saveSpeedY = this._firebaseData.ref('players/' + guestId + '/bullet/traject/sy');
+        var saveSpeedY = this._firebaseData.ref('players/' + this._guestId + '/bullet/traject/sy');
         saveSpeedY.on('value', function(snapshot) {
             dataGuest[4] = snapshot.val();
         });
-        var saveX = this._firebaseData.ref('players/' + guestId + '/bullet/x');
+        var saveX = this._firebaseData.ref('players/' + this._guestId + '/bullet/x');
         saveX.on('value', function(snapshot) {
             dataGuest[0] = snapshot.val();
         });
-        var saveY = this._firebaseData.ref('players/' + guestId + '/bullet/y');
+        var saveY = this._firebaseData.ref('players/' + this._guestId + '/bullet/y');
         saveY.on('value', function(snapshot) {
             dataGuest[1] = snapshot.val();
         });
-        var saveDir = this._firebaseData.ref('players/' + guestId + '/bullet/d');
+        var saveDir = this._firebaseData.ref('players/' + this._guestId + '/bullet/d');
         saveDir.on('value', function(snapshot) {
             dataGuest[2] = snapshot.val();
         });
@@ -129,9 +133,11 @@ firebaseHandler.prototype.readBulletData = function () {
 
 firebaseHandler.prototype.readBulletStatus = function () {
     var data;
-    var saveStatus = this._firebaseData.ref('players/' + guestId + '/bullet/fired');
-    saveStatus.on('value', function(snapshot) {
-        data = snapshot.val();
-    });
+    if (this._status == 1) {
+        var saveStatus = this._firebaseData.ref('players/' + this._guestId + '/bullet/fired');
+        saveStatus.on('value', function(snapshot) {
+            data = snapshot.val();
+        });
+    }
     return data;
 };

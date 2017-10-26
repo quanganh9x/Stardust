@@ -13,12 +13,11 @@ gameStatus.prototype.updateGameArea = function() {
     firebasePort.writeData("tank");
     myGamePiece.draw(myGameArea.ctx);
 };
-
 gameStatus.prototype.updateBullet = function() {
     if (loaded.Bullet && myGamePiece.hasAlreadyShot) {
         myGameArea.clear(bulletTraject.x, bulletTraject.y, define._sizebullet, define._sizebullet);
         bulletTraject.newPos();
-        if (bulletTraject.hitBorder()) {
+        if (bulletTraject.hitBorder() || bulletTraject.hitObstacles() == 1) {
             myGameArea.clear(bulletTraject.x, bulletTraject.y, define._sizebullet, define._sizebullet);
             loaded.Bullet = false;
         }
