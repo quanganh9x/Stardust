@@ -13,6 +13,7 @@ var loaded = {
     Bullet: false
 };
 
+var bulletWait = 2000; // 2s / shot. Will implement a modifier in later version
 var FPS = 60;
 
 var myGamePiece, myGamePiece2;

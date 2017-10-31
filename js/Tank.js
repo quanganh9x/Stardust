@@ -33,16 +33,11 @@ Tank.prototype.draw = function (ctx) {
 Tank.prototype.shot = function () {
     if (!this.hasAlreadyShot) {
         this.hasAlreadyShot = true;
-        firebasePort.writeShotStatus("fired");
         var setThis = this; // hotfix for settimeout() function
         setTimeout(function () {
             setThis.hasAlreadyShot = false;
-        },1000);
-        setTimeout(function () {
-            firebasePort.writeShotStatus("clear");
-        },1500);
+        },bulletWait);
         bulletTraject = new Bullet(this.x, this.y, this.direction);
-        firebasePort.writeData("bullet");
         bulletTraject.init();
     }
 };
@@ -109,7 +104,6 @@ Tank.prototype.hitObstacles = function () {
                 if ((left < this.mapBlocks[i].r + 1 && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && this.rendered.getActive(i)) {
                     this.x = this.mapBlocks[i].r;
                     this.clearMove();
-
                     return 1;
                 }
                 break;

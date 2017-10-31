@@ -12,6 +12,7 @@ require_once "config.php";
             margin: 0;
             padding: 0;
             height: 100%;
+            overflow: hidden;
         }
         canvas {
             border: 2px solid black;
@@ -30,6 +31,17 @@ require_once "config.php";
             top: 0;
             background-color: black;
             z-index: 10;
+        }
+        div {
+            display: block;
+            margin: 10px 30%;
+        }
+        fieldset {
+            position: static;
+            padding: 10px;
+        }
+        legend {
+            text-align: left;
         }
     </style>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
@@ -68,6 +80,7 @@ require_once "config.php";
         var cache = new cacheCanvas();
         var rendered = new mapRender();
         rendered.getMap(1);
+        var multi = new Multiplayer();
         var check = false;
         document.addEventListener("DOMContentLoaded", function(event) {
             var cookieStr = document.cookie;
@@ -84,18 +97,27 @@ require_once "config.php";
             }*/
         });
     </script>
+
 </head>
-<body onload="fucked()"><div id="beepbloop">
+<body scroll="no">
 <!-- <audio autoplay="autoplay">
     <source src="sound/yayyyyyyyy.mp3" />
 </audio> -->
-<div style="text-align:center; width:320px;">
-    <p>You are in: <span id="mode">Offline</span> mode</p>
+<div class="header">
+    <fieldset>
+    <legend><span id="mode">Offline</span> mode</legend>
     <input type="text" id="user1" placeholder="Player 01"/>
     <input type="text" id="user2" placeholder="Player 02"/>
-    <button onclick="firebasePort.getUser()">Get ?</button>
+    <button onclick="firebasePort.getUser()">Get</button>
+    </fieldset>
 </div>
-<footer>Copyright &copy; 2017 quanganh9x</footer>
-</div>
+    <div class="main" id="gamezone">
+    <fieldset id="panel">
+        <legend>Panel</legend>
+        <button onclick="manager.matchmaking()">1v1 matchmaking</button>
+        <button onclick="window.location.assign('logout.php')">Logout</button>
+    </fieldset>
+    </div>
+<!-- <footer>Copyright &copy; 2017 quanganh9x</footer> -->
 </body>
 </html>

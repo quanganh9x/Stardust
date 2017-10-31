@@ -32,7 +32,7 @@ Bullet.prototype.init = function () {
             this.speedX = 7;
             break;
     }
-    firebasePort.writeBulletData();
+    firebasePort.writeData("bullet");
 };
 
 Bullet.prototype.newPos = function () {
