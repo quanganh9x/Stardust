@@ -22,5 +22,12 @@ gameStatus.prototype.updateBullet = function() {
             loaded.Bullet = false;
         }
         else bulletTraject.draw(myGameArea.ctx);
-    } else myGameArea.draw("main");
+    }
+};
+gameStatus.prototype.updateBrokenBlocks = function (ctx) {
+    myGameArea.draw("main");
+    ctx.fillStyle = "black";
+    for (i=0;i<rendered.getBrokenTiles().length;i++) {
+                ctx.fillRect(rendered.getBrokenTiles()[i].x, rendered.getBrokenTiles()[i].y, rendered.getBrokenTiles()[i].m, rendered.getBrokenTiles()[i].n);
+    }
 };

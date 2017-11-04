@@ -5,9 +5,11 @@ function mapRender(id) {
         base: [],
         curtain: []
     };
+    this._broken = [];
     this._active = [];
 
     this.getMap(1);
+    this.initBlocks();
 }
 
 mapRender.prototype.getMap = function (id) {
@@ -27,24 +29,25 @@ mapRender.prototype.getMap = function (id) {
     }
 };
 
+mapRender.prototype.initBlocks = function () {
+    for (i=0;i<this._construct.brick.length;i++) this._active.push({u: this._construct.brick[i].y, d: this._construct.brick[i].y + define._sizeblock, l: this._construct.brick[i].x, r: this._construct.brick[i].x + define._sizeblock, status: 1});
+    for (i=0;i<this._construct.steel.length;i++) this._active.push({u: this._construct.steel[i].y, d: this._construct.steel[i].y + define._sizeblock, l: this._construct.steel[i].x, r: this._construct.steel[i].x + define._sizeblock, status: 1});
+};
+
 mapRender.prototype.getBlocks = function () {
-    var blocks = [];
-    for (i=0;i<this._construct.brick.length;i++) blocks.push({u: this._construct.brick[i].y, d: this._construct.brick[i].y + define._sizeblock, l: this._construct.brick[i].x, r: this._construct.brick[i].x + define._sizeblock});
-    for (i=0;i<this._construct.steel.length;i++) blocks.push({u: this._construct.steel[i].y, d: this._construct.steel[i].y + define._sizeblock, l: this._construct.steel[i].x, r: this._construct.steel[i].x + define._sizeblock});
-    this.setActive(blocks);
-    return blocks;
+    return this._active;
 };
 
-mapRender.prototype.setActive = function (arrBlock) {
-    for (i=0;i<arrBlock.length;i++) this._active.push(true);
+mapRender.prototype.throwOut = function (i) {
+    this._active[i].status = 0; // 1 to 0
 };
 
-mapRender.prototype.getActive = function (i) {
-    return this._active[i];
+mapRender.prototype.getBrokenTiles = function () {
+    return this._broken;
 };
 
-mapRender.prototype.deActive = function (i) {
-    this._active[i] = false;
+mapRender.prototype.deActive = function (x, y, m, n, dir, i) {
+    this._broken.push({x: x, y: y, m: m, n: n, dir: dir, i: i});
 };
 mapRender.prototype.draw = function (ctx) {
     for (i=0;i<this._construct.brick.length;i += 1) ctx.drawImage(imgRender.getImage("", "brick"), this._construct.brick[i].x, this._construct.brick[i].y, define._sizeblock, define._sizeblock);

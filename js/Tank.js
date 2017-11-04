@@ -11,19 +11,12 @@ function Tank(x, y) {
     this.restrictDown = 0;
     this.restrictLeft = 0;
     this.restrictRight = 0;
+    this.mapBlocks = rendered.getBlocks();
 }
-
-
-Tank.prototype.mapInit = function () {
-    this.rendered = new mapRender();
-    this.rendered.getMap(1);
-    this.mapBlocks = this.rendered.getBlocks(1);
-};
 
 Tank.prototype.init = function () {
     loaded.Tank = true;
     this.move();
-    this.mapInit();
 };
 
 Tank.prototype.draw = function (ctx) {
@@ -34,10 +27,11 @@ Tank.prototype.shot = function () {
     if (!this.hasAlreadyShot) {
         this.hasAlreadyShot = true;
         var setThis = this; // hotfix for settimeout() function
+        bulletTraject = new Bullet(this.x, this.y, this.direction);
         setTimeout(function () {
             setThis.hasAlreadyShot = false;
+            myGameArea.clear(bulletTraject.x, bulletTraject.y, define._sizebullet, define._sizebullet);
         },bulletWait);
-        bulletTraject = new Bullet(this.x, this.y, this.direction);
         bulletTraject.init();
     }
 };
@@ -72,7 +66,7 @@ Tank.prototype.move = function () {
 
 Tank.prototype.newPos = function () {
     var components = new coreComponents(this.x, this.y, this.speedX, this.speedY);
-    if (this.hitObstacles() == 0) {
+    if (this.hitObstacles() == 0 || this.checkBroken(components.newPosX(), components.newPosY())) {
         this.x = components.newPosX();
         this.y = components.newPosY();
         this.hitBorder();
@@ -80,6 +74,7 @@ Tank.prototype.newPos = function () {
 };
 
 Tank.prototype.hitObstacles = function () {
+    var obs = false;
     var left = this.x;
     var up = this.y;
     var down = this.y + define._sizetank;
@@ -87,36 +82,72 @@ Tank.prototype.hitObstacles = function () {
     for (var i=0;i<this.mapBlocks.length;i++) {
         switch (this.direction) {
             case "up":
-                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && this.rendered.getActive(i)) {
+                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && !this.checkThrownOut(i)) {
                     this.y = this.mapBlocks[i].d;
                     this.clearMove();
-                    return 1;
+                    obs = true;
                 }
                 break;
             case "down":
-                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && this.rendered.getActive(i)) {
+                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && !this.checkThrownOut(i)) {
                     this.y = this.mapBlocks[i].u - define._sizetank;
                     this.clearMove();
-                    return 1;
+                    obs = true;
                 }
                 break;
             case "left":
-                if ((left < this.mapBlocks[i].r + 1 && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && this.rendered.getActive(i)) {
+                if ((left < this.mapBlocks[i].r && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && !this.checkThrownOut(i)) {
                     this.x = this.mapBlocks[i].r;
                     this.clearMove();
-                    return 1;
+                    obs = true;
                 }
                 break;
             case "right":
-                if ((right > this.mapBlocks[i].l - 1 && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && this.rendered.getActive(i)) {
+                if ((right > this.mapBlocks[i].l && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && !this.checkThrownOut(i)) {
                     this.x = this.mapBlocks[i].l - define._sizetank;
                     this.clearMove();
-                    return 1;
+                    obs = true;
                 }
                 break;
         }
     }
+    if (obs) return 1;
     return 0;
+};
+
+Tank.prototype.checkBroken = function(x, y) {
+    var brokenTiles = rendered.getBrokenTiles();
+    this.onBrokenTile = false;
+    var left = x;
+    var up = y;
+    var down = y + define._sizetank;
+    var right = x + define._sizetank;
+    for (j=0; j<brokenTiles.length; j++) {
+        var u = brokenTiles[j].y;
+        var d = brokenTiles[j].y + brokenTiles[j].n;
+        var l = brokenTiles[j].x;
+        var r = brokenTiles[j].x + brokenTiles[j].m;
+        switch (this.direction) {
+            case "up":
+                if ((up < d && up > u) && (left < r && right > l)) this.onBrokenTile = true;
+                break;
+            case "down":
+                if ((down > u && down < d) && (left < r && right > l)) this.onBrokenTile = true;
+                break;
+            case "left":
+                if ((left < r && (left + define._sizetank) >= r) && (up < d && down > u)) this.onBrokenTile = true;
+                break;
+            case "right":
+                if ((right > l && right < r) && (up < d && down > u)) this.onBrokenTile = true;
+                break;
+        }
+    }
+    return this.onBrokenTile;
+};
+
+Tank.prototype.checkThrownOut = function(i) {
+    if (this.mapBlocks[i].status == 1) return false;
+    return true;
 };
 
 Tank.prototype.hitBorder = function () {

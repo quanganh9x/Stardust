@@ -4,7 +4,7 @@ function Bullet(x, y, direction) {
     this.speedX = 0;
     this.speedY = 0;
     this.direction = direction;
-    this.mapBlocks = rendered.getBlocks(1);
+    this.mapBlocks = rendered.getBlocks();
 }
 
 
@@ -13,23 +13,23 @@ Bullet.prototype.init = function () {
     switch (this.direction) {
         case "up":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
-            this.y = this.y - define._sizebullet;
-            this.speedY = -7;
+            this.y = this.y + define._sizebullet/2;
+            this.speedY = -bulletSpeed;
             break;
         case "down":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
-            this.y = this.y + define._sizetank;
-            this.speedY = 7;
+            this.y = this.y - define._sizebullet/2;
+            this.speedY = bulletSpeed;
             break;
         case "left":
-            this.x = this.x - define._sizebullet;
+            this.x = this.x + define._sizebullet/2;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
-            this.speedX = -7;
+            this.speedX = -bulletSpeed;
             break;
         case "right":
-            this.x = this.x + define._sizetank;
+            this.x = this.x + define._sizebullet/2;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
-            this.speedX = 7;
+            this.speedX = bulletSpeed;
             break;
     }
     firebasePort.writeData("bullet");
@@ -37,14 +37,24 @@ Bullet.prototype.init = function () {
 
 Bullet.prototype.newPos = function () {
     var components = new coreComponents(this.x, this.y, this.speedX, this.speedY);
-    if (this.hitObstacles() == 0) {
+    if (this.hitBase()) components.lose();
+    if (!this.hitObstacles()) {
         this.x = components.newPosX();
         this.y = components.newPosY();
         this.hitBorder();
     } else return;
 };
 
+
+Bullet.prototype.hitBase = function() {
+    var basex = rendered._construct.base[0].x;
+    var basey = rendered._construct.base[0].y;
+    if (this.x > basex && this.x + define._sizebullet < basex + define._sizetank && this.y > basey && this.y + define._sizebullet < basey + define._sizetank) return true;
+    return false;
+};
+
 Bullet.prototype.hitObstacles = function () {
+    var obs = false, broken = false;
     var left = this.x;
     var up = this.y;
     var down = this.y + define._sizebullet;
@@ -52,60 +62,66 @@ Bullet.prototype.hitObstacles = function () {
     for (var i=0;i<this.mapBlocks.length;i++) {
         switch (this.direction) {
             case "up":
-                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u ) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && rendered.getActive(i)) {
-                    rendered.deActive(i);
-                    this.disappear(this.mapBlocks[i].l, this.mapBlocks[i].u, myGameArea.ctx, this.direction);
-                    return 1;
+                if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u ) && (left < this.mapBlocks[i].r && right > this.mapBlocks[i].l) && !this.checkThrownOut(i)) {
+                    obs = true;
+                    if (!this.checkBroken(i)) rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u + define._sizeblock / 2, define._sizeblock, define._sizeblock / 2, "up", i);
+                    else {
+                        rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u, define._sizeblock, define._sizeblock / 2, "down", i);
+                        rendered.throwOut(i);
+                    }
                 }
                 break;
             case "down":
-                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && rendered.getActive(i)) {
-                    rendered.deActive(i);
-                    this.disappear(this.mapBlocks[i].l, this.mapBlocks[i].u, myGameArea.ctx, this.direction);
-                    return 1;
+                if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r && right > this.mapBlocks[i].l) && !this.checkThrownOut(i)) {
+                    obs = true;
+                    if (!this.checkBroken(i)) rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u, define._sizeblock, define._sizeblock / 2, "down", i);
+                    else {
+                        rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u + define._sizeblock / 2, define._sizeblock, define._sizeblock / 2, "down", i);
+                        rendered.throwOut(i);
+                    }
                 }
                 break;
             case "left":
-                if ((left < this.mapBlocks[i].r + 1 && left > this.mapBlocks[i].l) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && rendered.getActive(i)) {
-                    rendered.deActive(i);
-                    this.disappear(this.mapBlocks[i].l, this.mapBlocks[i].u, myGameArea.ctx, this.direction);
-                    return 1;
+                if ((left < this.mapBlocks[i].r && left > this.mapBlocks[i].l) && (up < this.mapBlocks[i].d && down > this.mapBlocks[i].u) && !this.checkThrownOut(i)) {
+                    obs = true;
+                    if (!this.checkBroken(i)) rendered.deActive(this.mapBlocks[i].l + define._sizeblock / 2, this.mapBlocks[i].u, define._sizeblock / 2, define._sizeblock, "left", i);
+                    else {
+                        rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u, define._sizeblock / 2, define._sizeblock, "left", i);
+                        rendered.throwOut(i);
+                    }
                 }
                 break;
             case "right":
-                if ((right > this.mapBlocks[i].l - 1 && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && rendered.getActive(i)) {
-                    rendered.deActive(i);
-                    this.disappear(this.mapBlocks[i].l, this.mapBlocks[i].u, myGameArea.ctx, this.direction);
-                    return 1;
+                if ((right > this.mapBlocks[i].l && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d && down > this.mapBlocks[i].u) && !this.checkThrownOut(i)) {
+                    obs = true;
+                    if (!this.checkBroken(i)) rendered.deActive(this.mapBlocks[i].l, this.mapBlocks[i].u, define._sizeblock / 2, define._sizeblock, "right", i);
+                    else {
+                        rendered.deActive(this.mapBlocks[i].l + define._sizeblock / 2, this.mapBlocks[i].u, define._sizeblock / 2, define._sizeblock, "right", i);
+                        rendered.throwOut(i); // goodbye my block-friend
+                    }
                 }
                 break;
         }
     }
-    return 0;
+    if (obs && !broken) return true;
+    return false;
 };
 
-Bullet.prototype.disappear = function (x, y, ctx, dir) {
-    ctx.fillStyle = "black";
-    switch (dir) {
-        case "up":
-            ctx.fillRect(x, y + define._sizeblock / 2, define._sizeblock, define._sizeblock / 2);
-            break;
-        case "down":
-            ctx.fillRect(x, y, define._sizeblock, define._sizeblock / 2);
-            break;
-        case "left":
-            ctx.fillRect(x + define._sizeblock / 2, y, define._sizeblock / 2, define._sizeblock);
-            break;
-        case "right":
-            ctx.fillRect(x, y, define._sizeblock / 2, define._sizeblock);
-            break;
-    }
+Bullet.prototype.checkBroken = function (i) {//
+    var brokenTiles = rendered.getBrokenTiles();
+    for (j=0;j<brokenTiles.length;j++) if (brokenTiles[j].i == i) return true;
+    return false;
+};
+
+Bullet.prototype.checkThrownOut = function (i) {
+    if (this.mapBlocks[i].status == 1) return false;
+    return true;
 };
 
 Bullet.prototype.hitBorder = function () {
     var heightBorder = myGameArea._myGameArea.height - define._sizebullet - 16;
     var widthBorder = myGameArea._myGameArea.width - define._sizebullet - 32*2;
-    if (this.x < 32 || this.x > widthBorder || this.y < 16 || this.y > heightBorder) return true;
+    if (this.x - define._sizebullet < 32 || this.x + define._sizebullet > widthBorder || this.y - define._sizebullet < 16 || this.y + define._sizebullet > heightBorder) return true;
     return false;
 };
 Bullet.prototype.draw = function (ctx) {

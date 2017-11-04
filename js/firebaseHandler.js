@@ -1,9 +1,9 @@
 function firebaseHandler(data) {
     this._firebaseData = data;
     this._players = 2;
-    this._status = 1;
-    this._userId = "quanganh9x";
-    this._guestId = "test";
+    this._status = 0;
+    this._userId = "";
+    this._guestId = "";
     this._written = false;
 }
 
@@ -37,11 +37,12 @@ firebaseHandler.prototype.getUser = function () {
 };
 // use for joining 2 players
 firebaseHandler.prototype.writeData = function (type) {
-    var db = this._firebaseData.ref("players/" + this._userId + "/" + type);
-    if (this.status == 1) {
+    var db = "players/" + this._userId + "/" + type;
+    var setThis = this;
+    if (this.status() == 1) {
         switch (type) {
             case "tank":
-                db.set({
+                this._firebaseData.ref(db).set({
                     life: myGamePiece.life,
                     x: myGamePiece.x,
                     y: myGamePiece.y,
@@ -50,20 +51,18 @@ firebaseHandler.prototype.writeData = function (type) {
                 break;
             case "bullet":
                 var trajectdb = db + "/" + "traject";
-                trajectdb.set({
+                this._firebaseData.ref(db).set({
+                    x: bulletTraject.x,
+                    y: bulletTraject.y,
+                    d: bulletTraject.direction,
+                    fired: "yes"
+                });
+                this._firebaseData.ref(trajectdb).set({
                     sx: bulletTraject.speedX,
                     sy: bulletTraject.speedY
                 });
-                db.set({
-                    x: bulletTraject.x,
-                    y: bulletTraject.y,
-                    d: bulletTraject.direction
-                });
-                db.set({
-                    fired: "yes"
-                });
                 setTimeout(function () {
-                    db.set({
+                    setThis._firebaseData.ref(db).set({
                         fired: "no"
                     });}, bulletWait);
                 break;
@@ -71,54 +70,39 @@ firebaseHandler.prototype.writeData = function (type) {
     }
 };
 firebaseHandler.prototype.fetchData = function (type, value, retVal) {
-    var val;
-    var db = this._firebaseData.ref("players/" + this._guestId + "/" + type);
-    if (this.status == 1) {
+    var current;
+    var db = "players/" + this._guestId + "/" + type;
+    if (this.status() == 1) {
         switch (type) {
             case "tank":
                 var tankdb = db + "/" + retVal; /// x, y, d, life
-                tankdb.on('value', function (snapshot) {
-                    val = snapshot.val();
-                    return val;
+                this._firebaseData.ref(tankdb).on('value', function (snapshot) {
+                    current = snapshot.val();
                 });
-                return 0;
                 break;
             case "bullet":
                 switch (value) {
                     case "shotdata":
                         var bulletdb = db + "/" + retVal; /// x, y, d
-                        bulletdb.on('value', function (snapshot) {
-                            val = snapshot.val();
-                            return val;
+                        this._firebaseData.ref(bulletdb).on('value', function (snapshot) {
+                            current = snapshot.val();
                         });
                         break;
                     case "traject":
                         var trajectdb = db + "/" + value + "/" + retVal; // sx, sy
-                        trajectdb.on('value', function (snapshot) {
-                            val = snapshot.val();
-                            return val;
+                        this._firebaseData.ref(trajectdb).on('value', function (snapshot) {
+                            current = snapshot.val();
                         });
                         break;
                     case "shotstatus":
                         var bulletdb = db + "/" + "fired"; //// fired
-                        bulletdb.on('value', function (snapshot) {
-                            val = snapshot.val();
-                            return val;
+                        this._firebaseData.ref(bulletdb).on('value', function (snapshot) {
+                            current = snapshot.val();
                         });
                         break;
                 }
                 break;
         }
     }
-};
-
-firebaseHandler.prototype.readBulletStatus = function () {
-    var data;
-    if (this._status == 1) {
-        var saveStatus = this._firebaseData.ref('players/' + this._guestId + '/bullet/fired');
-        saveStatus.on('value', function(snapshot) {
-            data = snapshot.val();
-        });
-    }
-    return data;
+    if (current) return current;
 };

@@ -41,8 +41,9 @@ sceneManager.prototype.clear = function (x, y, m, n) {
 sceneManager.prototype.loop = function () {
     setInterval(function() {
         requestAnimationFrame(function() {
-            var game = new gameStatus();
+            game.updateBrokenBlocks(myGameArea.ctx);
             multi.p2.updatePlayer();
+            multi.p2.updateBullet();
             game.updateGameArea();
             game.updateBullet();
         } );
