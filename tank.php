@@ -80,6 +80,7 @@ require_once "config.php";
         var cache = new cacheCanvas();
         var rendered = new mapRender();
         rendered.getMap(1);
+        var game = new gameStatus();
         var multi = new Multiplayer();
         var check = false;
         document.addEventListener("DOMContentLoaded", function(event) {

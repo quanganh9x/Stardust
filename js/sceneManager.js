@@ -19,7 +19,16 @@ sceneManager.prototype.welcome = function () {
     this.draw("loading");
 };
 
+sceneManager.prototype.win = function () {
+
+};
+
+sceneManager.prototype.lose = function () {
+
+};
+
 sceneManager.prototype.draw = function(type) {
+    var setThis = this;
     switch (type) {
         case "main":
             this.ctx.drawImage(cache.renderedCanvas(), 0, 0);
@@ -27,8 +36,9 @@ sceneManager.prototype.draw = function(type) {
         case "loading":
             var progress = imgRender.getLoadingProgress();
             var hash = "Y2FjaGVkPTE=";
-            this._welcomeArea.ctx.fillText("Loading: "+progress+"% completed",0, 0);
-            console.log(this._welcomeArea.ctx);
+            setInterval(function () {
+                setThis._welcomeArea.ctx.fillText("Loading: " + progress + "% completed", 0, 0);
+            }, 1000 / FPS);
             document.cookie = hash;
             break;
     }

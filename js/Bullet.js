@@ -13,21 +13,21 @@ Bullet.prototype.init = function () {
     switch (this.direction) {
         case "up":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
-            this.y = this.y + define._sizebullet/2;
+            this.y = this.y + define._sizetank/2;
             this.speedY = -bulletSpeed;
             break;
         case "down":
             this.x = this.x + (define._sizetank/2) - (define._sizebullet/2);
-            this.y = this.y - define._sizebullet/2;
+            this.y = this.y - define._sizetank/2;
             this.speedY = bulletSpeed;
             break;
         case "left":
-            this.x = this.x + define._sizebullet/2;
+            this.x = this.x + define._sizetank/2;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
             this.speedX = -bulletSpeed;
             break;
         case "right":
-            this.x = this.x + define._sizebullet/2;
+            this.x = this.x + define._sizetank/2;
             this.y = this.y + (define._sizetank/2) - (define._sizebullet/2);
             this.speedX = bulletSpeed;
             break;
@@ -37,7 +37,14 @@ Bullet.prototype.init = function () {
 
 Bullet.prototype.newPos = function () {
     var components = new coreComponents(this.x, this.y, this.speedX, this.speedY);
-    if (this.hitBase()) components.lose();
+    switch (this.hitObjects()) {
+        case "tankcollapsed":
+            console.log("boom");
+            break;
+        case "basecollapsed":
+            console.log("boommmmm");
+            break;
+    }
     if (!this.hitObstacles()) {
         this.x = components.newPosX();
         this.y = components.newPosY();
@@ -46,10 +53,13 @@ Bullet.prototype.newPos = function () {
 };
 
 
-Bullet.prototype.hitBase = function() {
+Bullet.prototype.hitObjects = function() {
     var basex = rendered._construct.base[0].x;
     var basey = rendered._construct.base[0].y;
-    if (this.x > basex && this.x + define._sizebullet < basex + define._sizetank && this.y > basey && this.y + define._sizebullet < basey + define._sizetank) return true;
+    var tankx = firebasePort.fetchData("tank", "", "x");
+    var tanky = firebasePort.fetchData("tank", "", "y");
+    if (this.x > basex && this.x + define._sizebullet < basex + define._sizetank && this.y > basey && this.y + define._sizebullet < basey + define._sizetank) return "basecollapsed";
+    if (this.x > tankx && this.x + define._sizebullet < tankx + define._sizetank && this.y > tanky && this.y + define._sizebullet < tanky + define._sizetank) return "tankcollapsed";
     return false;
 };
 

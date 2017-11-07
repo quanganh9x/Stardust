@@ -83,28 +83,32 @@ Tank.prototype.hitObstacles = function () {
         switch (this.direction) {
             case "up":
                 if ((up < this.mapBlocks[i].d && up > this.mapBlocks[i].u) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && !this.checkThrownOut(i)) {
-                    this.y = this.mapBlocks[i].d;
+                    if (this.checkBroken(left, up + define._sizeblock / 2 - define._smooth)) this.y = this.mapBlocks[i].d - define._sizeblock / 2;
+                    else this.y = this.mapBlocks[i].d;
                     this.clearMove();
                     obs = true;
                 }
                 break;
             case "down":
                 if ((down > this.mapBlocks[i].u && down < this.mapBlocks[i].d) && (left < this.mapBlocks[i].r - define._smooth && right > this.mapBlocks[i].l + define._smooth) && !this.checkThrownOut(i)) {
-                    this.y = this.mapBlocks[i].u - define._sizetank;
+                    if (this.checkBroken(left, up - define._sizeblock / 2 + define._smooth)) this.y = this.mapBlocks[i].u - define._sizetank + define._sizeblock / 2;
+                    else this.y = this.mapBlocks[i].u - define._sizetank;
                     this.clearMove();
                     obs = true;
                 }
                 break;
             case "left":
                 if ((left < this.mapBlocks[i].r && (left + define._sizetank) >= this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && !this.checkThrownOut(i)) {
-                    this.x = this.mapBlocks[i].r;
+                    if (this.checkBroken(left + define._sizeblock / 2 - define._smooth, up)) this.x = this.mapBlocks[i].r - define._sizeblock / 2;
+                    else this.x = this.mapBlocks[i].r;
                     this.clearMove();
                     obs = true;
                 }
                 break;
             case "right":
                 if ((right > this.mapBlocks[i].l && right < this.mapBlocks[i].r) && (up < this.mapBlocks[i].d - define._smooth && down > this.mapBlocks[i].u + define._smooth) && !this.checkThrownOut(i)) {
-                    this.x = this.mapBlocks[i].l - define._sizetank;
+                    if (this.checkBroken(left - define._sizeblock / 2 + define._smooth, up)) this.x = this.mapBlocks[i].l - define._sizetank + define._sizeblock / 2;
+                    else this.x = this.mapBlocks[i].l - define._sizetank;
                     this.clearMove();
                     obs = true;
                 }
@@ -117,7 +121,7 @@ Tank.prototype.hitObstacles = function () {
 
 Tank.prototype.checkBroken = function(x, y) {
     var brokenTiles = rendered.getBrokenTiles();
-    this.onBrokenTile = false;
+    var onBrokenTile = false;
     var left = x;
     var up = y;
     var down = y + define._sizetank;
@@ -129,20 +133,20 @@ Tank.prototype.checkBroken = function(x, y) {
         var r = brokenTiles[j].x + brokenTiles[j].m;
         switch (this.direction) {
             case "up":
-                if ((up < d && up > u) && (left < r && right > l)) this.onBrokenTile = true;
+                if ((up < d && up > u) && (left < r && right > l)) onBrokenTile = true;
                 break;
             case "down":
-                if ((down > u && down < d) && (left < r && right > l)) this.onBrokenTile = true;
+                if ((down > u && down < d) && (left < r && right > l)) onBrokenTile = true;
                 break;
             case "left":
-                if ((left < r && (left + define._sizetank) >= r) && (up < d && down > u)) this.onBrokenTile = true;
+                if ((left < r && (left + define._sizetank) >= r) && (up < d && down > u)) onBrokenTile = true;
                 break;
             case "right":
-                if ((right > l && right < r) && (up < d && down > u)) this.onBrokenTile = true;
+                if ((right > l && right < r) && (up < d && down > u)) onBrokenTile = true;
                 break;
         }
     }
-    return this.onBrokenTile;
+    return onBrokenTile;
 };
 
 Tank.prototype.checkThrownOut = function(i) {
