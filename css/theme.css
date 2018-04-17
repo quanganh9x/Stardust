@@ -1,0 +1,88 @@
+.bro-playarea {
+    width: 41.66666667vh;
+    height: 16.01851852vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 7
+}
+.bro-playarea .bro-colorbg,
+.bro-playarea .cdt-text {
+    opacity: 1;
+    transition: opacity 1s ease-in-out
+}
+.bro-playarea .bro-lastbg {
+    width: 41.66666667vh;
+    height: 16.01851852vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url(/2017.09.14-2017.11.15-871/assets/images/play-group.png) 0 0 no-repeat;
+    background-size: cover
+}
+.bro-playarea .bro-colorbg {
+    width: 41.01851852vh;
+    height: 14.35185185vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: round;
+    background-position: 0 0;
+    background-size: cover
+}
+.bro-playarea div[class^=bro-condition] {
+    width: 25vh;
+    left: 2.77777778vh;
+    top: 1.2962963vh;
+    display: none;
+    position: absolute;
+    line-height: 1;
+    font-family: bombard;
+    text-transform: uppercase;
+    transition: all .4s;
+    cursor: pointer
+}
+.bro-playarea div[class^=bro-condition] .cdt-text {
+    width: 25vh;
+    margin: 0 0 -.74074074vh 0;
+    line-height: 1;
+    text-shadow: 5px 5px 10px rgba(0, 0, 0, .8), -5px -5px 10px rgba(0, 0, 0, .4);
+    font-size: 7.6vh;
+    color: #fff;
+    letter-spacing: -2px;
+    -webkit-text-stroke: 1px #000
+}
+.bro-playarea div[class^=bro-condition] .desc-text {
+    position: relative;
+    font-size: 4.2vh;
+    font-family: moonshiner;
+    text-shadow: 4px 4px 5px rgba(0, 0, 0, .62);
+    color: #ffc700;
+    -webkit-text-stroke: 1px #000
+}
+.bro-playarea.bro-loading .bro-colorbg {
+    background-image: url(/2017.09.14-2017.11.15-871/assets/images/loading-bg.png)
+}
+.bro-playarea.bro-loading .bro-condition-loading {
+    display: block
+}
+.bro-playarea.bro-loading:after {
+    width: 42.5vh;
+    height: 21.38888889vh;
+    top: 3.61111111vh;
+    left: -6.2962963vh;
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 100;
+    background: -webkit-linear-gradient(left, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, .5) 8%, #fff 16%, hsla(0, 0%, 100%, .5) 19%, hsla(0, 0%, 100%, 0) 20%);
+    background-position: inherit;
+    -webkit-mask: url(/2017.09.14-2017.11.15-871/assets/images/play-bg1.png) 0 0 no-repeat;
+    -webkit-mask-size: cover;
+    -webkit-transform: rotate(-30deg);
+    transform: rotate(-30deg);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-animation: shine linear 2s infinite;
+    animation: shine linear 2s infinite
+}
