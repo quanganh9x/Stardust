@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Lobby - quanganh9x's Tank-worlds</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css"/>
+    <style>
+        .row {
+            position: inherit;
+            margin: 70px auto;
+        }
+        .card {
+            min-height: 250px;
+        }
+        button {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+        <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+        <a class="navbar-brand active" href="index.html">quanganh9x</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="game.html">Play <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">What's New ?</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav mt-2 mt-md-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="login.html" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Login
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <form style="padding: 20px;" method="POST" action="api/login.php">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="user" placeholder="Username">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="pass" placeholder="Password">
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" checked>
+                                    Autologin ?
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="register.html">Register</a>
+                </li>
+            </ul>
+            <span class="navbar-text" style="color: black;">
+                Hello, Guest!
+        </span>
+        </div>
+    </nav>
+    </div>
+</div>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Playground</h4>
+                    <p class="card-text">Let's get into a fight! - A traditional mode which features Campaign, Solo 1v1 and Squad 3v3 mode. An additional mode CONSTRUCTION is also available</p>
+                    <button type="button" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-chevron-right"></span> Try and Feel</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Store</h4>
+                    <p class="card-text">A *shorter* way to get skins and boosts for your tank. Lottery is available for a chance to win an EXCLUSIVE item!</p>
+                    <p class="card-text">Currently <b>0%</b> off!</p>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block"><span class="glyphicon glyphicon-cutlery"></span> I love shoppin'</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Daily mission</h4>
+                    <p class="card-text">Reset at 24:00 every day. Claim coins and xp to speed-up your journey</p>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block">Rewards</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Leaderboards</h4>
+                    <p class="card-text">Hall of Fame features the greatest. Congratulations!</p>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block">The Best 100</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Inventory</h4>
+                    <p class="card-text">A place to store your items. You can use them everytime, everywhere except some special modes that is restricted access to some items</p>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block"><span id="numItems"></span> things are stored</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="footer-container">
+        <span class="text-muted">Copyright &copy; 2017 quanganh9x. Based on BattleCity&trade; by NAMCO 1985. Special thanks to <a href="https://github.com/newagebegins">@newagebegins</a> for the initial source code</span>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Gameplayer - quanganh9x's Tank-worlds</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8"/>
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-database.js"></script>
+    <script>
+        var config = {
+            apiKey: "AIzaSyAN_4NrplOO6g5VqzQI535ACfupwgs8maA",
+            authDomain: "quanganh9x-tank-worlds.firebaseapp.com",
+            databaseURL: "https://quanganh9x-tank-worlds.firebaseio.com",
+            projectId: "quanganh9x-tank-worlds",
+            storageBucket: "quanganh9x-tank-worlds.appspot.com",
+            messagingSenderId: "428762755077"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+    <script src="assets/js/Utils.js"></script>
+    <script src="assets/js/Point.js"></script>
+    <script src="assets/js/Rect.js"></script>
+    <script src="assets/js/Sprite.js"></script>
+    <script src="assets/js/Tank.js"></script>
+    <script src="assets/js/Wall.js"></script>
+    <script src="assets/js/SpriteContainer.js"></script>
+    <script src="assets/js/CollisionDetector.js"></script>
+    <script src="assets/js/EventManager.js"></script>
+    <script src="assets/js/SpriteController.js"></script>
+    <script src="assets/js/TankController.js"></script>
+    <script src="assets/js/Keyboard.js"></script>
+    <script src="assets/js/BulletFactory.js"></script>
+    <script src="assets/js/Bullet.js"></script>
+    <script src="assets/js/Painter.js"></script>
+    <script src="assets/js/Updater.js"></script>
+    <script src="assets/js/BulletExplosionFactory.js"></script>
+    <script src="assets/js/Explosion.js"></script>
+    <script src="assets/js/BulletExplosion.js"></script>
+    <script src="assets/js/BrickWall.js"></script>
+    <script src="assets/js/SteelWall.js"></script>
+    <script src="assets/js/Cursor.js"></script>
+    <script src="assets/js/BlinkTimer.js"></script>
+    <script src="assets/js/CursorController.js"></script>
+    <script src="assets/js/Builder.js"></script>
+    <script src="assets/js/StructureManager.js"></script>
+    <script src="assets/js/BrickWallFactory.js"></script>
+    <script src="assets/js/SteelWallFactory.js"></script>
+    <script src="assets/js/Globals.js"></script>
+    <script src="assets/js/SpriteSerializer.js"></script>
+    <script src="assets/js/Base.js"></script>
+    <script src="assets/js/TankStateAppearing.js"></script>
+    <script src="assets/js/TankStateNormal.js"></script>
+    <script src="assets/js/TankStateInvincible.js"></script>
+    <script src="assets/js/AITankController.js"></script>
+    <script src="assets/js/Random.js"></script>
+    <script src="assets/js/AITankControllerFactory.js"></script>
+    <script src="assets/js/AITankControllerContainer.js"></script>
+    <script src="assets/js/EnemyFactory.js"></script>
+    <script src="assets/js/Animation.js"></script>
+    <script src="assets/js/TankExplosionFactory.js"></script>
+    <script src="assets/js/TankExplosion.js"></script>
+    <script src="assets/js/PointsFactory.js"></script>
+    <script src="assets/js/Points.js"></script>
+    <script src="assets/js/PlayerTankFactory.js"></script>
+    <script src="assets/js/PlayerTankControllerFactory.js"></script>
+    <script src="assets/js/PowerUpFactory.js"></script>
+    <script src="assets/js/PowerUp.js"></script>
+    <script src="assets/js/PowerUpHandler.js"></script>
+    <script src="assets/js/FreezeTimer.js"></script>
+    <script src="assets/js/BaseWallBuilder.js"></script>
+    <script src="assets/js/ShovelHandler.js"></script>
+    <script src="assets/js/Pause.js"></script>
+    <script src="assets/js/PauseListener.js"></script>
+    <script src="assets/js/BaseExplosionFactory.js"></script>
+    <script src="assets/js/BaseExplosion.js"></script>
+    <script src="assets/js/TankColor.js"></script>
+    <script src="assets/js/SceneManager.js"></script>
+    <script src="assets/js/MainMenuScene.js"></script>
+    <script src="assets/js/MainMenuItem.js"></script>
+    <script src="assets/js/OnePlayerMenuItem.js"></script>
+    <script src="assets/js/TwoPlayerMenuItem.js"></script>
+    <script src="assets/js/SquadPlayerMenuItem.js"></script>
+    <script src="assets/js/ConstructionMenuItem.js"></script>
+    <script src="assets/js/MainMenu.js"></script>
+    <script src="assets/js/MainMenuController.js"></script>
+    <script src="assets/js/MainMenuView.js"></script>
+    <script src="assets/js/MainMenuCursor.js"></script>
+    <script src="assets/js/MainMenuCursorView.js"></script>
+    <script src="assets/js/Gamefield.js"></script>
+    <script src="assets/js/Level.js"></script>
+    <script src="assets/js/EnemyFactoryView.js"></script>
+    <script src="assets/js/LivesView.js"></script>
+    <script src="assets/js/MainMenuView.js"></script>
+    <script src="assets/js/Curtain.js"></script>
+    <script src="assets/js/Script.js"></script>
+    <script src="assets/js/Delay.js"></script>
+    <script src="assets/js/GameScene.js"></script>
+    <script src="assets/js/StageMessage.js"></script>
+    <script src="assets/js/Stages.js"></script>
+    <script src="assets/js/MoveFn.js"></script>
+    <script src="assets/js/GameOverMessage.js"></script>
+    <script src="assets/js/StageStatisticsScene.js"></script>
+    <script src="assets/js/GameOverScene.js"></script>
+    <script src="assets/js/Player.js"></script>
+    <script src="assets/js/StageStatisticsPoints.js"></script>
+    <script src="assets/js/Trees.js"></script>
+    <script src="assets/js/Water.js"></script>
+    <script src="assets/js/LoadingScene.js"></script>
+  
+    <script src="lib/Stats.js"></script>
+    <script src="assets/js/FPSCounter.js"></script>
+  
+    <script src="assets/js/ImageManager.js"></script>
+    <script src="assets/js/Construction.js"></script>
+    <script src="assets/js/SpriteSerializerController.js"></script>
+    <script src="assets/js/SpriteSerializer.js"></script>
+    <script src="assets/js/SoundManager.js"></script>
+    <script type="text/javascript">
+        var w;
+
+        if(typeof(Worker) !== "undefined") {
+            if (typeof(w) == "undefined") {
+                    w = new Worker("assets/js/Socket.js");
+            } else {
+                console.log("Worker is not supported. FPS will be limited at 30");
+                console.log("Update your browser to enjoy the game at the fulliest!");
+            }
+        }
+    </script>
+    <script type="text/javascript">
+    $(function () {
+
+      var FPS = 60;
+      
+      var CANVAS_ID = 'canvas';
+      var ctx = createCanvasContext();
+      ctx.font = "16px prstart";
+
+      //var connect = new Socket(firebase.database());
+      var eventManager = new EventManager();
+      var keyboard = new Keyboard(eventManager);
+      var sceneManager = new SceneManager(eventManager, w);
+      sceneManager.toLoadingScene();
+      
+      setInterval(gameLoop, 1000 / FPS);
+      
+      function gameLoop() {
+        keyboard.fireEvents();
+        sceneManager.update();
+        sceneManager.draw(ctx);
+      }
+      
+      function createCanvasContext() {
+        $('<canvas id="' + CANVAS_ID + '" width="' + Globals.CANVAS_WIDTH + '" height="' + Globals.CANVAS_HEIGHT + '"></canvas>').prependTo('#main');
+        var canvas = document.getElementById(CANVAS_ID);
+        return canvas.getContext('2d');
+      }
+    });
+    </script>
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css" />
+</head>
+<body>
+<div class="container">
+<nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+    <a class="navbar-brand" href="#">quanganh9x</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Play <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">What's New ?</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav mt-2 mt-md-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="login.html" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Login
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <form style="padding: 20px;" method="POST" action="api/login.php">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="user" placeholder="Username">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="pass" placeholder="Password">
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" checked>
+                                Autologin ?
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="register.html">Register</a>
+            </li>
+        </ul>
+        <span class="navbar-text" style="color: black;">
+                Hello, Guest!
+        </span>
+    </div>
+</nav>
+</div>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md" id="notifications">
+            <div class="card text-center">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Active</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Disabled</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Special title treatment</h4>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" id="main"></div>
+        <div class="col-md" id="userinfo">
+            <div class="card text-center">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Active</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Disabled</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Special title treatment</h4>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="footer-container">
+        <span class="text-muted">Copyright &copy; 2017 quanganh9x. Based on BattleCity&trade; by NAMCO 1985. Special thanks to <a href="https://github.com/newagebegins">@newagebegins</a> for the initial source code</span>
+    </div>
+</footer>
+</body>
+</html>
