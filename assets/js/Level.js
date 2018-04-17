@@ -1,4 +1,4 @@
-function Level(sceneManager, stageNumber, player) {
+function Level(sceneManager, stageNumber, player, w) {
   Gamefield.call(this, sceneManager);
   
   var self = this;
@@ -14,7 +14,7 @@ function Level(sceneManager, stageNumber, player) {
   
   new PlayerTankControllerFactory(this._eventManager);
   
-  this._playerTankFactory = new PlayerTankFactory(this._eventManager);
+  this._playerTankFactory = new PlayerTankFactory(this._eventManager, w);
   this._playerTankFactory.setAppearPosition(new Point(this._x + 4 * Globals.UNIT_SIZE, this._y + 12 * Globals.UNIT_SIZE));
   this._playerTankFactory.create();
 

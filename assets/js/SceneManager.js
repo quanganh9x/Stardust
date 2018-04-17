@@ -1,5 +1,6 @@
-function SceneManager(eventManager) {
+function SceneManager(eventManager, w) {
   this._eventManager = eventManager;
+  this._w = w;
   this._scene = null;
 }
 
@@ -28,7 +29,7 @@ SceneManager.prototype.toMainMenuScene = function (arrived) {
 
 SceneManager.prototype.toGameScene = function (stage, player) {
   this._eventManager.removeAllSubscribers();
-  this._scene = new GameScene(this, stage, player);
+  this._scene = new GameScene(this, stage, player, this._w);
 };
 
 SceneManager.prototype.toSquadGameScene = function (stage, player) {

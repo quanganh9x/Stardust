@@ -1,8 +1,19 @@
-function PlayerTankFactory(eventManager) {
+function PlayerTankFactory(eventManager, w) {
   this._eventManager = eventManager;
   this._eventManager.addSubscriber(this, [TankExplosion.Event.DESTROYED]);
   this._appearPosition = new Point(0, 0);
   this._active = true;
+  console.log("Player1's tank is spawned");
+  w.postMessage(["system", "testConnection"]);
+  w.onmessage = function (r) {
+      if (r.data) {
+          console.log("okay. proceed");
+      } else {
+          w.terminate();
+          console.log("terminating worker");
+          alert("Server's not responding");
+      }
+  }
 }
 
 PlayerTankFactory.Event = {};

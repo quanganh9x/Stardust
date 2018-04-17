@@ -17,10 +17,10 @@ function Tank(eventManager) {
   this._value = 0;
   this._flashing = false;
   this._collisionResolvingMoveLimit = 10;
-  this._upgradeLevel = 1;
+  this._upgradeLevel = 0;
   this._color = new TankColor();
   
-  this._hitLimit = 99;
+  this._hitLimit = 1;
   this._hit = 0;
   
   this._normalSpeed = 2;

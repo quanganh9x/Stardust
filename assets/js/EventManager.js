@@ -3,7 +3,6 @@ function EventManager() {
 }
 
 EventManager.prototype.addSubscriber = function (subscriber, events) {
-    console.log(subscriber + "///" + events);
   for (var i in events) {
     if (!this._subscribers[events[i]]) {
       this._subscribers[events[i]] = [];
@@ -27,7 +26,6 @@ EventManager.prototype.removeAllSubscribers = function () {
 };
 
 EventManager.prototype.fireEvent = function (event) {
-    console.log(event);
   var subscribers = this._subscribers[event.name];
   for (var i in subscribers) {
     subscribers[i].notify(event);
