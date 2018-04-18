@@ -6,5 +6,5 @@ function SquadMenuItem(sceneManager) {
 SquadMenuItem.subclass(MainMenuItem);
 
 SquadMenuItem.prototype.execute = function () {
-    this._sceneManager.toSquadGameScene();
+    this._sceneManager.toPvPGameScene("squad");
 };

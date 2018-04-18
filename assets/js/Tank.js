@@ -14,6 +14,7 @@ function Tank(eventManager) {
   this._type = Tank.Type.PLAYER_1;
   this._state = new TankStateNormal(this);
   this._player = true;
+  this._multi = false;
   this._value = 0;
   this._flashing = false;
   this._collisionResolvingMoveLimit = 10;
@@ -81,8 +82,21 @@ Tank.prototype.setType = function (type) {
   this._type = type;
 };
 
+Tank.prototype.setMulti = function () {
+    console.log("Multiplayer mode activated");
+    this._multi = true;
+};
+
+Tank.prototype.isMulti = function () {
+    return this._multi;
+};
+
 Tank.prototype.isPlayer = function () {
   return this._player;
+};
+
+Tank.prototype.isPlayer = function () {
+    return this._player;
 };
 
 Tank.prototype.isEnemy = function () {
@@ -217,7 +231,7 @@ Tank.prototype.move = function () {
   if (this._turn) {
     this._smoothTurn();
   }
-  Sprite.prototype.move.call(this, this.isPlayer());
+  Sprite.prototype.move.call(this, this.isPlayer(), this.isMulti());
 };
 
 Tank.prototype.canMove = function () {

@@ -79,21 +79,21 @@ Sprite.prototype.stop = function () {
   this._speed = 0;
 };
   
-Sprite.prototype.move = function (isPlayer) {
+Sprite.prototype.move = function (isPlayer, isMulti) {
   this._moveTimer++;
   if (this._moveTimer < this._moveFrequency || this._speed == 0) {
     return;
   }
   this._moveTimer = 0;
-  this.doMove(isPlayer);
+  this.doMove(isPlayer, isMulti);
 };
 
-Sprite.prototype.doMove = function (isPlayer) {
+Sprite.prototype.doMove = function (isPlayer, isMulti) {
   this._x = this._getNewX();
   this._y = this._getNewY();
   this._turn = false;
   this._eventManager.fireEvent({'name': Sprite.Event.MOVED, 'sprite': this});
-  if (isPlayer) this._eventManager.fireWorkerEvent({'name': 'Socket.Event.POST_PLAYER', 'data': this});
+  if (isPlayer && isMulti) this._eventManager.fireWorkerEvent({'name': 'Socket.Event.POST_PLAYER', 'data': this});
   this.moveHook();
 };
 

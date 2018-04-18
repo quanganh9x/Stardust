@@ -1,6 +1,5 @@
-function EventManager(w) {
+function EventManager() {
   this._subscribers = {};
-  this._w = w;
 }
 
 EventManager.prototype.addSubscriber = function (subscriber, events) {
@@ -31,6 +30,11 @@ EventManager.prototype.fireEvent = function (event) {
   for (var i in subscribers) {
     subscribers[i].notify(event);
   }
+};
+
+EventManager.prototype.setWorker = function (w) {
+    this._w = w;
+    console.log("Attached worker");
 };
 
 EventManager.prototype.fireWorkerEvent = function (event) {

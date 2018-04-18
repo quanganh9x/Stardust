@@ -5,19 +5,7 @@
     <title>Gameplayer - quanganh9x's Tank-worlds</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8"/>
-    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-database.js"></script>
-    <script>
-        var config = {
-            apiKey: "AIzaSyAN_4NrplOO6g5VqzQI535ACfupwgs8maA",
-            authDomain: "quanganh9x-tank-worlds.firebaseapp.com",
-            databaseURL: "https://quanganh9x-tank-worlds.firebaseio.com",
-            projectId: "quanganh9x-tank-worlds",
-            storageBucket: "quanganh9x-tank-worlds.appspot.com",
-            messagingSenderId: "428762755077"
-        };
-        firebase.initializeApp(config);
-    </script>
+
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"/>
@@ -102,6 +90,7 @@
     <script src="assets/js/Script.js"></script>
     <script src="assets/js/Delay.js"></script>
     <script src="assets/js/GameScene.js"></script>
+    <script src="assets/js/MultiGameScene.js"></script>
     <script src="assets/js/StageMessage.js"></script>
     <script src="assets/js/Stages.js"></script>
     <script src="assets/js/MoveFn.js"></script>
@@ -125,18 +114,6 @@
 
     <script src="assets/js/Connection.js"></script>
     <script type="text/javascript">
-        var w;
-
-        if(typeof(Worker) !== "undefined") {
-            if (typeof(w) == "undefined") {
-                    w = new Worker("assets/js/Socket.js");
-            } else {
-                console.log("Worker is not supported. FPS will be limited at 30");
-                console.log("Update your browser to enjoy the game at the fulliest!");
-            }
-        }
-    </script>
-    <script type="text/javascript">
     $(function () {
 
       var FPS = 60;
@@ -145,9 +122,9 @@
       var ctx = createCanvasContext();
       ctx.font = "16px prstart";
 
-      var eventManager = new EventManager(w);
+      var eventManager = new EventManager();
       var keyboard = new Keyboard(eventManager);
-      var sceneManager = new SceneManager(eventManager, w);
+      var sceneManager = new SceneManager(eventManager);
       sceneManager.toLoadingScene();
       
       setInterval(game, 1000 / FPS);

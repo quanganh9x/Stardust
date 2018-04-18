@@ -1,17 +1,15 @@
-function Connection() {
-    this._url = "https://google.com";
+function Connection(url) {
+    this.url = url;
+    this.testConnection();
 }
 
-Connection.Event = {};
-Connection.Event.TEST_CONNECTION = 'Connection.Event.TEST_CONNECTION';
+Connection.prototype.testConnection = function () {
+    var check = true;
+    if (check) {
+        this._w = new Worker(this.url);
+    } else console.log("connection dropped");
+};
 
-Connection.prototype.notify = function (event) {
-    if (event.name == Connection.Event.TEST_CONNECTION) {
-        var check = true;
-        if (!check) {
-            console.log("all failed");
-            event.worker.terminate();
-            event.worker = undefined;
-        }
-    }
+Connection.prototype.get = function () {
+    return this._w;
 };

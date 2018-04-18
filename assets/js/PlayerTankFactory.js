@@ -1,9 +1,9 @@
-function PlayerTankFactory(eventManager, w) {
+function PlayerTankFactory(type, eventManager) {
   this._eventManager = eventManager;
   this._eventManager.addSubscriber(this, [TankExplosion.Event.DESTROYED]);
   this._appearPosition = new Point(0, 0);
   this._active = true;
-  this._w = w;
+  this.type = type;
   console.log("Player1's tank is spawned");
 }
 
@@ -24,15 +24,15 @@ PlayerTankFactory.prototype.setAppearPosition = function (position) {
 };
 
 PlayerTankFactory.prototype.create = function () {
-  var tank = new Tank(this._eventManager);
-  tank.setPosition(this._appearPosition);
-  tank.setState(new TankStateAppearing(tank));
-  this._eventManager.fireEvent({'name': PlayerTankFactory.Event.PLAYER_TANK_CREATED, 'tank': tank});
-  this._eventManager.fireEvent({'name': Connection.Event.TEST_CONNECTION, 'worker': this._w});
-  if (this._w !== undefined) {
-      this._eventManager.fireWorkerEvent({'name': 'Socket.Event.SPAWN', 'data': tank});
-  }
-  return tank;
+    var tank = new Tank(this._eventManager);
+    tank.setPosition(this._appearPosition);
+    tank.setState(new TankStateAppearing(tank));
+    if (this.type == "solo") {
+        tank.setMulti();
+        this._eventManager.fireWorkerEvent({'name': 'Socket.Event.SPAWN'});
+    }
+    this._eventManager.fireEvent({'name': PlayerTankFactory.Event.PLAYER_TANK_CREATED, 'tank': tank});
+    return tank;
 };
 
 PlayerTankFactory.prototype.setActive = function (active) {

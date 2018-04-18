@@ -6,5 +6,5 @@ function SoloMenuItem(sceneManager) {
 SoloMenuItem.subclass(MainMenuItem);
 
 SoloMenuItem.prototype.execute = function () {
-    this._sceneManager.toGameScene();
+    this._sceneManager.toPvPGameScene("solo");
 };

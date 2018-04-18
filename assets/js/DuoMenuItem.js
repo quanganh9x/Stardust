@@ -6,5 +6,5 @@ function DuoMenuItem(sceneManager) {
 DuoMenuItem.subclass(MainMenuItem);
 
 DuoMenuItem.prototype.execute = function () {
-    this._sceneManager.toGameScene();
+    this._sceneManager.toPvPGameScene("duo");
 };
