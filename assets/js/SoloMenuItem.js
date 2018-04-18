@@ -1,6 +1,6 @@
 function SoloMenuItem(sceneManager) {
     MainMenuItem.call(this, sceneManager);
-    this.setName("Solo (1v1)");
+    this.setName("1v1 Ranked Solo");
 }
 
 SoloMenuItem.subclass(MainMenuItem);

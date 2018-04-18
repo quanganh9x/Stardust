@@ -217,8 +217,7 @@ Tank.prototype.move = function () {
   if (this._turn) {
     this._smoothTurn();
   }
-  Sprite.prototype.move.call(this);
-  // call workers to update the position
+  Sprite.prototype.move.call(this, this.isPlayer());
 };
 
 Tank.prototype.canMove = function () {

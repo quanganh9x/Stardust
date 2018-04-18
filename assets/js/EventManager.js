@@ -1,5 +1,6 @@
-function EventManager() {
+function EventManager(w) {
   this._subscribers = {};
+  this._w = w;
 }
 
 EventManager.prototype.addSubscriber = function (subscriber, events) {
@@ -30,4 +31,15 @@ EventManager.prototype.fireEvent = function (event) {
   for (var i in subscribers) {
     subscribers[i].notify(event);
   }
+};
+
+EventManager.prototype.fireWorkerEvent = function (event) {
+    if (event.data !== undefined) {
+        var data = {
+            x: event.data._x,
+            y: event.data._y,
+            direction: event.data.getDirection()
+        };
+        this._w.postMessage([event.name, JSON.stringify(data)]);
+    } else this._w.postMessage([event.name]);
 };

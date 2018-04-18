@@ -1,6 +1,6 @@
 function SquadMenuItem(sceneManager) {
     MainMenuItem.call(this, sceneManager);
-    this.setName("4v4 PvP (hard)");
+    this.setName("4v4 PvP (constructing)");
 }
 
 SquadMenuItem.subclass(MainMenuItem);

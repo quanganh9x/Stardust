@@ -84,8 +84,9 @@
     <script src="assets/js/MainMenuScene.js"></script>
     <script src="assets/js/MainMenuItem.js"></script>
     <script src="assets/js/OnePlayerMenuItem.js"></script>
-    <script src="assets/js/TwoPlayerMenuItem.js"></script>
-    <script src="assets/js/SquadPlayerMenuItem.js"></script>
+    <script src="assets/js/SoloMenuItem.js"></script>
+    <script src="assets/js/DuoMenuItem.js"></script>
+    <script src="assets/js/SquadMenuItem.js"></script>
     <script src="assets/js/ConstructionMenuItem.js"></script>
     <script src="assets/js/MainMenu.js"></script>
     <script src="assets/js/MainMenuController.js"></script>
@@ -121,6 +122,8 @@
     <script src="assets/js/SpriteSerializerController.js"></script>
     <script src="assets/js/SpriteSerializer.js"></script>
     <script src="assets/js/SoundManager.js"></script>
+
+    <script src="assets/js/Connection.js"></script>
     <script type="text/javascript">
         var w;
 
@@ -142,15 +145,14 @@
       var ctx = createCanvasContext();
       ctx.font = "16px prstart";
 
-      //var connect = new Socket(firebase.database());
-      var eventManager = new EventManager();
+      var eventManager = new EventManager(w);
       var keyboard = new Keyboard(eventManager);
       var sceneManager = new SceneManager(eventManager, w);
       sceneManager.toLoadingScene();
       
-      setInterval(gameLoop, 1000 / FPS);
+      setInterval(game, 1000 / FPS);
       
-      function gameLoop() {
+      function game() {
         keyboard.fireEvents();
         sceneManager.update();
         sceneManager.draw(ctx);

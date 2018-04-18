@@ -10,6 +10,7 @@ function MainMenuScene(sceneManager) {
   this._mainMenu.setItems([
     new OnePlayerMenuItem(this._sceneManager),
     new SoloMenuItem(this._sceneManager),
+    new DuoMenuItem(this._sceneManager),
     new SquadMenuItem(this._sceneManager),
     new ConstructionMenuItem(this._sceneManager)
   ]);

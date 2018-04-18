@@ -3,17 +3,8 @@ function PlayerTankFactory(eventManager, w) {
   this._eventManager.addSubscriber(this, [TankExplosion.Event.DESTROYED]);
   this._appearPosition = new Point(0, 0);
   this._active = true;
+  this._w = w;
   console.log("Player1's tank is spawned");
-  w.postMessage(["system", "testConnection"]);
-  w.onmessage = function (r) {
-      if (r.data) {
-          console.log("okay. proceed");
-      } else {
-          w.terminate();
-          console.log("terminating worker");
-          alert("Server's not responding");
-      }
-  }
 }
 
 PlayerTankFactory.Event = {};
@@ -24,7 +15,7 @@ PlayerTankFactory.prototype.notify = function (event) {
     return;
   }
   if (this._tankExplosionDestroyed(event)) {
-    this.create();
+      this.create();
   }
 };
 
@@ -37,6 +28,10 @@ PlayerTankFactory.prototype.create = function () {
   tank.setPosition(this._appearPosition);
   tank.setState(new TankStateAppearing(tank));
   this._eventManager.fireEvent({'name': PlayerTankFactory.Event.PLAYER_TANK_CREATED, 'tank': tank});
+  this._eventManager.fireEvent({'name': Connection.Event.TEST_CONNECTION, 'worker': this._w});
+  if (this._w !== undefined) {
+      this._eventManager.fireWorkerEvent({'name': 'Socket.Event.SPAWN', 'data': tank});
+  }
   return tank;
 };
 
