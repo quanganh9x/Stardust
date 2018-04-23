@@ -1,4 +1,4 @@
-function Level(sceneManager, type, stageNumber, player) {
+function Level(sceneManager, stageNumber, player) {
   Gamefield.call(this, sceneManager);
   
   var self = this;
@@ -6,15 +6,17 @@ function Level(sceneManager, type, stageNumber, player) {
   this._eventManager.addSubscriber(this, [
     BaseExplosion.Event.DESTROYED,
     Player.Event.OUT_OF_LIVES,
-    EnemyFactory.Event.LAST_ENEMY_DESTROYED
+    EnemyFactory.Event.LAST_ENEMY_DESTROYED,
+    MultiEnemyFactory.Event.ENEMY_DESTROYED
   ]);
   
   this._visible = false;
   this._stage = stageNumber;
   
   new PlayerTankControllerFactory(this._eventManager);
-  
-  this._playerTankFactory = new PlayerTankFactory(type, this._eventManager);
+
+
+  this._playerTankFactory = new PlayerTankFactory(this._eventManager);
   this._playerTankFactory.setAppearPosition(new Point(this._x + 4 * Globals.UNIT_SIZE, this._y + 12 * Globals.UNIT_SIZE));
   this._playerTankFactory.create();
 
@@ -24,18 +26,27 @@ function Level(sceneManager, type, stageNumber, player) {
   new BaseExplosionFactory(this._eventManager);
   new PointsFactory(this._eventManager);
   this._freezeTimer = new FreezeTimer(this._eventManager);
-  
-  this._aiControllersContainer = new AITankControllerContainer(this._eventManager);
-  this._aiTankControllerFactory = new AITankControllerFactory(this._eventManager, this._spriteContainer);
 
-  this._enemyFactory = new EnemyFactory(this._eventManager);
-  this._enemyFactory.setPositions([
-    new Point(this._x + 6 * Globals.UNIT_SIZE, this._y),
-    new Point(this._x + 12 * Globals.UNIT_SIZE, this._y),
-    new Point(this._x, this._y),
-  ]);
+    if (this.getType() == "solo") {
+        console.log("multi enemy factory");
+        this._multiEnemyFactory = new MultiEnemyFactory(this._eventManager);
+        this._multiEnemyFactoryView = new MultiEnemyFactoryView(this._multiEnemyFactory);
+    } else if (this.getType() == undefined) {
+        console.log("normal enemy factory");
+        this._aiControllersContainer = new AITankControllerContainer(this._eventManager);
+        this._aiTankControllerFactory = new AITankControllerFactory(this._eventManager, this._spriteContainer);
+
+        this._enemyFactory = new EnemyFactory(this._eventManager);
+        this._enemyFactory.setPositions([
+            new Point(this._x + 6 * Globals.UNIT_SIZE, this._y),
+            new Point(this._x + 12 * Globals.UNIT_SIZE, this._y),
+            new Point(this._x, this._y),
+        ]);
+
+        this._enemyFactoryView = new EnemyFactoryView(this._enemyFactory);
+    } else console.log("fuck");
   
-  this._enemyFactoryView = new EnemyFactoryView(this._enemyFactory);
+
   
   this._createPowerUpFactory();
   
@@ -83,10 +94,16 @@ function Level(sceneManager, type, stageNumber, player) {
 
 Level.subclass(Gamefield);
 
+Level.prototype.getType = function () {
+    return this._eventManager.getType();
+};
+
 Level.prototype.update = function () {
   Gamefield.prototype.update.call(this);
-  this._enemyFactory.update();
-  this._aiControllersContainer.update();
+  if (this._enemyFactory !== undefined) {
+    this._enemyFactory.update();
+    this._aiControllersContainer.update();
+  } else this._multiEnemyFactory.update();
   this._freezeTimer.update();
   this._shovelHandler.update();
   this._pause.update();
@@ -99,7 +116,9 @@ Level.prototype.draw = function (ctx) {
     return;
   }
   Gamefield.prototype.draw.call(this, ctx);
-  this._enemyFactoryView.draw(ctx);
+    if (this._enemyFactory !== undefined) {
+        this._enemyFactoryView.draw(ctx);
+    } else this._multiEnemyFactoryView.draw(ctx);
   this._pause.draw(ctx);
   this._livesView.draw(ctx);
   this._drawFlag(ctx);
@@ -120,7 +139,7 @@ Level.prototype.notify = function (event) {
     this._pause.setActive(false);
     this._playerTankFactory.setActive(false);
   }
-  else if (event.name == EnemyFactory.Event.LAST_ENEMY_DESTROYED) {
+  else if (event.name == EnemyFactory.Event.ENEMY_DESTROYED && this._enemyFactory !== undefined) {
     this._levelTransitionScript.setActive(true);
   }
 };
@@ -130,8 +149,10 @@ Level.prototype._loadStage = function (stageNumber) {
   
   var serializer = new SpriteSerializer(this._eventManager);
   serializer.unserializeSprites(stage.map);
-  
-  this._enemyFactory.setEnemies(stage.tanks);
+
+    if (this._enemyFactory !== undefined) {
+        this._enemyFactory.setEnemies(stage.tanks);
+    }
 };
 
 Level.prototype._createPowerUpFactory = function () {

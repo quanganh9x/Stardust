@@ -32,18 +32,25 @@ EventManager.prototype.fireEvent = function (event) {
   }
 };
 
-EventManager.prototype.setWorker = function (w) {
-    this._w = w;
-    console.log("Attached worker");
+EventManager.prototype.initSocketInstance = function () {
+    this._socket = new Socket();
 };
 
-EventManager.prototype.fireWorkerEvent = function (event) {
-    if (event.data !== undefined) {
-        var data = {
-            x: event.data._x,
-            y: event.data._y,
-            direction: event.data.getDirection()
-        };
-        this._w.postMessage([event.name, JSON.stringify(data)]);
-    } else this._w.postMessage([event.name]);
+EventManager.prototype.getSocketGetInstance = function () {
+    return this._socket.getGetWorker();
 };
+
+EventManager.prototype.getSocketPostInstance = function () {
+    return this._socket.getPostWorker();
+};
+
+EventManager.prototype.setType = function (type) {
+    this._type = type;
+    this.initSocketInstance();
+    console.log("Attached type & workers - multiplayer mode");
+};
+
+EventManager.prototype.getType = function () {
+    return this._type;
+};
+

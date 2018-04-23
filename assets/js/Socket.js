@@ -1,39 +1,25 @@
-var s = new Socket();
-Socket.Event = {};
-Socket.Event.SPAWN = 'Socket.Event.SPAWN';
-Socket.Event.POST_PLAYER = 'Socket.Event.POST_PLAYER';
-Socket.Event.GET_ENEMY = 'Socket.Event.GET_ENEMY';
-
-onmessage = function (m) {
-    if (m.data[0] == Socket.Event.SPAWN) {
-        console.log("spawn success");
-    } else if (m.data[0] == Socket.Event.POST_PLAYER) {
-        s.setTank(JSON.parse(m.data[1]));
-        s.post();
-    }
-};
-
-
-
 function Socket() {
+    //this._database = new Firebase();
+    this.init();
 }
 
-Socket.prototype.setTank = function (tank) {
-    this._tank = tank;
-};
-Socket.prototype.getTankX = function () {
-    return this._tank.x;
-};
-Socket.prototype.getTankY = function () {
-    return this._tank.y;
-};
-Socket.prototype.getTankDirection = function () {
-    return this._tank.direction;
+Socket.prototype.init = function () {
+    this.setGetWorker(new Worker("assets/js/SocketGet.js"));
+    this.setPostWorker(new Worker("assets/js/SocketPost.js"));
 };
 
-
-Socket.prototype.post = function () {
-    console.log(this._tank);
+Socket.prototype.setGetWorker = function (w) {
+    this._getWorker = w;
 };
 
+Socket.prototype.setPostWorker = function (w) {
+    this._postWorker = w;
+};
 
+Socket.prototype.getGetWorker = function () {
+    return this._getWorker;
+};
+
+Socket.prototype.getPostWorker = function () {
+    return this._postWorker;
+};

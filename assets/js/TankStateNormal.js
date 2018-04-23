@@ -30,7 +30,7 @@ TankStateNormal.prototype.updateTrackAnimation = function () {
   if (this._tank.getSpeed() == 0) {
     return;
   }
-  this._trackAnimation.update()
+  this._trackAnimation.update();
 };
 
 TankStateNormal.prototype.draw = function (ctx) {

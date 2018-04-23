@@ -88,12 +88,23 @@ Sprite.prototype.move = function (isPlayer, isMulti) {
   this.doMove(isPlayer, isMulti);
 };
 
+Sprite.prototype.getWorker = function () {
+    return this._eventManager.getSocketPostInstance();
+};
+
 Sprite.prototype.doMove = function (isPlayer, isMulti) {
   this._x = this._getNewX();
   this._y = this._getNewY();
   this._turn = false;
   this._eventManager.fireEvent({'name': Sprite.Event.MOVED, 'sprite': this});
-  if (isPlayer && isMulti) this._eventManager.fireWorkerEvent({'name': 'Socket.Event.POST_PLAYER', 'data': this});
+  if (isPlayer && isMulti) {
+      var data = {
+          _x: this._x,
+          _y: this._y,
+          _direction: this._direction
+      };
+      this.getWorker().postMessage(['Socket.Event.POST_PLAYER', JSON.stringify(data)]);
+  }
   this.moveHook();
 };
 

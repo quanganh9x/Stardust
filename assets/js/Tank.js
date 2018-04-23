@@ -95,10 +95,6 @@ Tank.prototype.isPlayer = function () {
   return this._player;
 };
 
-Tank.prototype.isPlayer = function () {
-    return this._player;
-};
-
 Tank.prototype.isEnemy = function () {
   return !this._player;
 };
