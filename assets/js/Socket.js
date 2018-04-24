@@ -1,5 +1,4 @@
 function Socket() {
-    //this._database = new Firebase();
     this.init();
 }
 
