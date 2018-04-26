@@ -1,4 +1,4 @@
-function Firebase(player, database) {
+function Firebase(player) {
     this._player = player;
     this._database = database;
 }
