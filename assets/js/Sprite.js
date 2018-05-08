@@ -99,9 +99,13 @@ Sprite.prototype.doMove = function (isPlayer, isMulti) {
   this._eventManager.fireEvent({'name': Sprite.Event.MOVED, 'sprite': this});
   if (isPlayer && isMulti) {
       var data = {
-          _x: this._x,
-          _y: this._y,
-          _direction: this._direction
+          x: this._x,
+          y: this._y,
+          direction: this._direction,
+          upgradeLevel: this._upgradeLevel,
+          hitLimit: this._hitLimit,
+          bulletsLimit: this._bulletsLimit,
+          normalSpeed: this._normalSpeed
       };
       this.getWorker().postMessage(['Socket.Event.POST_PLAYER', JSON.stringify(data)]);
   }

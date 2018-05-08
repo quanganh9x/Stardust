@@ -32,6 +32,14 @@ EventManager.prototype.fireEvent = function (event) {
   }
 };
 
+EventManager.prototype.logEvent = function (event) {
+    GlobalConfigurations.EVENT_LOG.push({
+        name: event,
+        time: Date.now()
+    });
+    this.getSocketPostInstance().postMessage([event]);
+};
+
 EventManager.prototype.initSocketInstance = function () {
     this._socket = new Socket();
 };

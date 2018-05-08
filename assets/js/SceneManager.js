@@ -33,12 +33,11 @@ SceneManager.prototype.toGameScene = function (stage, player) {
 };
 
 
-SceneManager.prototype.toPvPGameScene = function (type, stage, player) {
-    console.log(type);
+SceneManager.prototype.toPvPGameScene = function (type, stage) {
     if (type == "solo") {
         this._eventManager.removeAllSubscribers();
         this._eventManager.setType(type);
-        this._scene = new MultiGameScene(this, 4, player); // 4 is stage. can be change
+        this._scene = new MultiGameScene(this, stage);
     } else alert("Constructing...");
 };
 

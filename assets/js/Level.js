@@ -17,7 +17,9 @@ function Level(sceneManager, stageNumber, player) {
 
 
   this._playerTankFactory = new PlayerTankFactory(this._eventManager);
-  this._playerTankFactory.setAppearPosition(new Point(this._x + 4 * Globals.UNIT_SIZE, this._y + 12 * Globals.UNIT_SIZE));
+  // differ starting point
+  if (GlobalConfigurations.USE_STARTING_POINT) this._playerTankFactory.setAppearPosition(GlobalConfigurations.STARTING_POINT);
+  else this._playerTankFactory.setAppearPosition(new Point(this._x + 4 * Globals.UNIT_SIZE, this._y + 12 * Globals.UNIT_SIZE));
   this._playerTankFactory.create();
 
   new BulletFactory(this._eventManager);
@@ -30,8 +32,9 @@ function Level(sceneManager, stageNumber, player) {
     if (this.getType() == "solo") {
         console.log("multi enemy factory");
         this._multiEnemyFactory = new MultiEnemyFactory(this._eventManager);
-        this._multiEnemyFactoryView = new MultiEnemyFactoryView(this._multiEnemyFactory);
-    } else if (this.getType() == undefined) {
+        //this._multiEnemyFactoryView = new MultiEnemyFactoryView(this._multiEnemyFactory);
+
+    } else if (this.getType() === undefined) {
         console.log("normal enemy factory");
         this._aiControllersContainer = new AITankControllerContainer(this._eventManager);
         this._aiTankControllerFactory = new AITankControllerFactory(this._eventManager, this._spriteContainer);
@@ -44,7 +47,7 @@ function Level(sceneManager, stageNumber, player) {
         ]);
 
         this._enemyFactoryView = new EnemyFactoryView(this._enemyFactory);
-    } else console.log("fuck");
+    }
   
 
   
@@ -70,7 +73,7 @@ function Level(sceneManager, stageNumber, player) {
   this._shovelHandler.setBaseWallBuilder(baseWallBuilder);
   
   this._pause = new Pause(this._eventManager);
-  
+
   this._player = player === undefined ? new Player() : player;
   this._player.setEventManager(this._eventManager);
   
@@ -100,9 +103,9 @@ Level.prototype.getType = function () {
 
 Level.prototype.update = function () {
   Gamefield.prototype.update.call(this);
-  if (this._enemyFactory !== undefined) {
-    this._enemyFactory.update();
-    this._aiControllersContainer.update();
+  if (this.getType() === undefined) { // normal mode
+      this._enemyFactory.update();
+      this._aiControllersContainer.update();
   } else this._multiEnemyFactory.update();
   this._freezeTimer.update();
   this._shovelHandler.update();
@@ -116,9 +119,9 @@ Level.prototype.draw = function (ctx) {
     return;
   }
   Gamefield.prototype.draw.call(this, ctx);
-    if (this._enemyFactory !== undefined) {
-        this._enemyFactoryView.draw(ctx);
-    } else this._multiEnemyFactoryView.draw(ctx);
+  if (this.getType() === undefined) { // normal mode
+      this._enemyFactoryView.draw(ctx);
+  }
   this._pause.draw(ctx);
   this._livesView.draw(ctx);
   this._drawFlag(ctx);
@@ -127,6 +130,10 @@ Level.prototype.draw = function (ctx) {
 
 Level.prototype.show = function () {
   this._visible = true;
+};
+
+Level.prototype.getWorker = function () {
+    return this._eventManager.getSocketPostInstance();
 };
 
 Level.prototype.notify = function (event) {
@@ -139,8 +146,18 @@ Level.prototype.notify = function (event) {
     this._pause.setActive(false);
     this._playerTankFactory.setActive(false);
   }
-  else if (event.name == EnemyFactory.Event.ENEMY_DESTROYED && this._enemyFactory !== undefined) {
-    this._levelTransitionScript.setActive(true);
+  else if (event.name == EnemyFactory.Event.LAST_ENEMY_DESTROYED) {
+      this._levelTransitionScript.setActive(true);
+  }
+  if (this.getType() == "solo") {
+      if (event.name == MultiEnemyFactory.Event.ENEMY_DESTROYED) {
+          console.log("enemy destroyed");
+          this._gameOverScript.setActive(true); // will be another script
+          this._pause.setActive(false);
+          this._eventManager.logEvent("Socket.Notification.IAM_WIN");
+          this.getWorker().postMessage(['Socket.Event.LOG_TRANSFER', GlobalConfigurations.EVENT_LOG]);
+          GlobalConfigurations.EVENT_LOG = [];
+      }
   }
 };
 

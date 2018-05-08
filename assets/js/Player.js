@@ -1,4 +1,6 @@
 function Player() {
+    this._name = Globals.PLAYER;
+    this._room = Globals.ROOM_CODE;
   this._lives = 99;
   this._score = 0;
   this.resetTanks();

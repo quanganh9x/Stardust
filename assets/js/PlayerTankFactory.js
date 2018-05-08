@@ -3,8 +3,6 @@ function PlayerTankFactory(eventManager) {
   this._eventManager.addSubscriber(this, [TankExplosion.Event.DESTROYED]);
   this._appearPosition = new Point(0, 0);
   this._active = true;
-
-  console.log("Player1's tank is spawned");
 }
 
 PlayerTankFactory.Event = {};
@@ -37,9 +35,21 @@ PlayerTankFactory.prototype.create = function () {
     tank.setState(new TankStateAppearing(tank));
     if (this.getType() == "solo") {
         tank.setMulti();
-        this.getWorker().postMessage(['Socket.Event.SPAWN_PLAYER']);
+        this.getWorker().postMessage(['Socket.Event.SPAWN_PLAYER', [GlobalConfigurations.ROOM_CODE, GlobalConfigurations.PLAYER, GlobalConfigurations.ENEMY]]);
+        var data = {
+            x: tank._x,
+            y: tank._y,
+            direction: "up",
+            upgradeLevel: tank._upgradeLevel,
+            hitLimit: tank._hitLimit,
+            bulletsLimit: tank._bulletsLimit,
+            normalSpeed: tank._normalSpeed
+        };
+        this.getWorker().postMessage(['Socket.Event.POST_PLAYER', JSON.stringify(data)]);
+        this._eventManager.logEvent('Socket.Notification.TANK_READY');
     }
     this._eventManager.fireEvent({'name': PlayerTankFactory.Event.PLAYER_TANK_CREATED, 'tank': tank});
+
     return tank;
 };
 
@@ -55,5 +65,6 @@ PlayerTankFactory.prototype._tankExplosionDestroyed = function (event) {
   if (!tank.isPlayer()) {
     return false;
   }
+  if (this.getType() == "solo") this._eventManager.logEvent("Socket.Notification.IAM_LOSE");
   return true;
 };

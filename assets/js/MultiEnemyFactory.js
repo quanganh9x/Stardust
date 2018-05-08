@@ -4,8 +4,9 @@ function MultiEnemyFactory(eventManager) {
 
     this._pauseListener = new PauseListener(this._eventManager);
 
-    this._position = new Point(19, 252);
-    this._direction = "up";
+    this._position = new Point(0, 0);
+    this._direction = "down";
+    this.getWorker().postMessage(['Socket.Event.SPAWN_ENEMY', [GlobalConfigurations.ROOM_CODE, GlobalConfigurations.ENEMY, GlobalConfigurations.PLAYER]]);
 }
 
 MultiEnemyFactory.Event = {};
@@ -37,11 +38,16 @@ MultiEnemyFactory.prototype.update = function () {
         return;
     }
     const self = this;
+    const consoleWindow = console;
     this.getWorker().postMessage(['Socket.Event.GET_ENEMY']);
     this.getWorker().onmessage = function (response) {
-        let data = JSON.parse(response.data);
-        self.setPosition(new Point(data.x, data.y));
-        self.setDirection(data.direction);
+        let data = response.data;
+        self.setPosition(new Point(data[0], data[1]));
+        self.setDirection(data[2]);
+        if (data[3] !== undefined) {
+            self._tank.shoot();
+            self.getWorker().postMessage(['Socket.Event.SHOT']);
+        }
     };
     if (this.getPosition() !== undefined && this._tank == undefined) this.init();
     else this.createEnemy(this.getPosition(), this.getDirection());
@@ -56,8 +62,8 @@ MultiEnemyFactory.prototype.init = function () {
 MultiEnemyFactory.prototype.createEnemy = function (position, direction) {
     this._tank.setPosition(position);
     this._tank.setDirection(direction);
-    //tank.setMoveFrequency(2);
-    //tank.setTrackAnimationDuration(4);
+    //this._tank.setMoveFrequency(2);
+    //this._tank.setTrackAnimationDuration(4);
 
     //this._eventManager.fireEvent({'name': MultiEnemyFactory.Event.ENEMY_CREATED, 'enemy': tank});
 

@@ -31,7 +31,8 @@ function Tank(eventManager) {
   
   this._bulletsLimit = 1;
   this._bullets = 0;
-  
+  this._bulletTime = 2000; // 2s 1 bullet
+    this._bulletTimeout = false;
   this._bulletType = Bullet.Type.NORMAL;
   
   // turn smoothing sensitivity
@@ -142,10 +143,19 @@ Tank.prototype.shoot = function () {
   if (!this._state.canShoot()) {
     return;
   }
+  if (this._bulletTimeout) {
+      return;
+  }
   if (this._bullets >= this._bulletsLimit) {
     return;
   }
   this._bullets++;
+  /*
+  this._bulletTimeout = true;
+  setTimeout(() => {
+      this._bulletTimeout = false;
+      }, this._bulletTime);
+      */
   this._eventManager.fireEvent({'name': Tank.Event.SHOOT, 'tank': this});
 };
 

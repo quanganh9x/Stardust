@@ -12,7 +12,7 @@ function MainMenuScene(sceneManager) {
     new SoloMenuItem(this._sceneManager),
     new DuoMenuItem(this._sceneManager),
     new SquadMenuItem(this._sceneManager),
-    new ConstructionMenuItem(this._sceneManager)
+    //new ConstructionMenuItem(this._sceneManager)
   ]);
   
   this._mainMenuController = new MainMenuController(this._eventManager, this._mainMenu);
